@@ -45,9 +45,9 @@ const postGasCosts_1 = __nccwpck_require__(5931);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const current = core.getInput('current_json');
+            const current = core.getInput('current_json', { required: true });
             const old = core.getInput('old_json');
-            const github_token = core.getInput('GITHUB_TOKEN');
+            const github_token = core.getInput('repo_token', { required: true });
             const octokit = github.getOctokit(github_token);
             if (old) {
                 (0, postGasCosts_1.postDiff)(current, old);
@@ -87,78 +87,61 @@ const fs_1 = __nccwpck_require__(7147);
 function postUsage(current_json_path, github, context) {
     return __awaiter(this, void 0, void 0, function* () {
         const gasUsage = getGasUsage(current_json_path);
-        // const commentBody = buildComment(gasUsage, context.sha);
-        // const { data: comments } = await github.rest.issues.listComments({
-        //     issue_number: context.issue.number,
-        //     owner: context.repo.owner,
-        //     repo: context.repo.repo
-        // });
-        // const botComment = comments.find(comment => comment?.user?.id === 41898282);
-        // if (botComment) {
-        //     await github.rest.issues.updateComment({
-        //         comment_id: botComment.id,
-        //         owner: context.repo.owner,
-        //         repo: context.repo.repo,
-        //         body: commentBody
-        //     });
-        // } else {
-        //     await github.rest.issues.createComment({
-        //         issue_number: context.issue.number,
-        //         owner: context.repo.owner,
-        //         repo: context.repo.repo,
-        //         body: commentBody
-        //     });
-        // }
+        const commentBody = buildComment(gasUsage, context.sha);
+        const { data: comments } = yield github.rest.issues.listComments({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo
+        });
+        const botComment = comments.find(comment => { var _a; return ((_a = comment === null || comment === void 0 ? void 0 : comment.user) === null || _a === void 0 ? void 0 : _a.id) === 41898282; });
+        if (botComment) {
+            yield github.rest.issues.updateComment({
+                comment_id: botComment.id,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: commentBody
+            });
+        }
+        else {
+            yield github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: commentBody
+            });
+        }
     });
 }
 exports.postUsage = postUsage;
 function getGasUsage(json_file) {
-    //let gasUsage = {};
-    (0, fs_1.readFile)(json_file, { encoding: 'utf8' }, (err, data) => {
-        if (err) {
-            throw err;
-        }
-        if (data) {
-            console.log(data);
-            // TODO
-        }
-    });
+    const data = (0, fs_1.readFileSync)(json_file, { encoding: 'utf8' });
+    console.log(data);
+    return JSON.parse(data);
 }
-// function buildComment(gasUsage, sha: string) {
-//     const commentHeader = " \
-//     ![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png) \
-//     ~Gas Usage Report ~ \
-//     ![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png)";
-//     var commentData = "";
-//     // TODO
-//     return commentHeader + '\n' + commentData;
-// }
+function buildComment(gasUsage, sha) {
+    const commentHeader = `![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png) \
+    ~ [Cosm-Orc](https://github.com/de-husk/cosm-orc) Gas Usage Report ~ \
+    ![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png)
+  `;
+    var commentData = `${sha}\n`;
+    for (var [contract, v] of Object.entries(gasUsage)) {
+        commentData += `  * ${contract}:` + '\n';
+        console.log(v);
+        for (var [op_name, report] of Object.entries(v)) {
+            commentData += `    * ${op_name}:` + '\n';
+            console.log(report);
+            commentData += `      * GasUsed: ${report.gas_used}:` + '\n';
+            commentData += `      * GasWanted: ${report.gas_wanted}:` + '\n';
+        }
+    }
+    return commentHeader + '\n' + commentData;
+}
 function postDiff(current_json_path, old_json_path) {
     return __awaiter(this, void 0, void 0, function* () {
         // TODO
     });
 }
 exports.postDiff = postDiff;
-// function buildDiffComment(gasUsage, baseSha, sha) {
-//     const commentHeader = " \
-//     ![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png) \
-//     ~Gas Diff Report ~ \
-//     ![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png)";
-//     var commentData = "";
-//     for (var contract in gasUsage) {
-//         commentData += `  * ${contract}:` + '\n';
-//         for (var f in gasUsage[contract]) {
-//             const mainUsage = gasUsage[contract][f]["main"];
-//             const prUsage = gasUsage[contract][f]["pr"];
-//             const pctChange = (prUsage - mainUsage) / mainUsage * 100;
-//             commentData += `    * ${f}:` + '\n';
-//             commentData += `      * Change: ${pctChange}%` + '\n';
-//             commentData += `      * main: ${baseSha}: ${mainUsage} ` + '\n';
-//             commentData += `      * PR: ${sha}: ${prUsage}` + '\n\n';
-//         }
-//     }
-//     return commentHeader + '\n' + commentData;
-// }
 
 
 /***/ }),

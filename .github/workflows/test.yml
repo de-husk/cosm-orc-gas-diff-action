@@ -12,13 +12,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: |
-          npm install
+          yarn install
       - run: |
-          npm run all
+          yarn run all
   test: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: ./
         with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           current_json: "./test_data/current.json"

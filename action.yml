@@ -1,7 +1,13 @@
 name: 'Cosm-orc Gas Diff Github Action'
 description: 'Github action that posts gas usage reports from cosm-orc as Github PR comments'
 author: 'de-husk'
+branding:
+  icon: "check"
+  color: "blue"
 inputs:
+  repo_token:
+    description: "Github token for the repo to allow posting a comment to the PR. Can be passed in using {{ secrets.GITHUB_TOKEN }}"
+    required: true
   # If you want to diff two gas reports also set `old` input.
   current_json:
     required: true
