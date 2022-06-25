@@ -1,11 +1,14 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Cosm-orc Gas Diff Github Action'
+description: 'Github action that posts gas usage reports from cosm-orc as Github PR comments'
+author: 'de-husk'
 inputs:
-  milliseconds: # change this
+  # If you want to diff two gas reports also set `old` input.
+  current_json:
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    description: 'current gas_report.json file path'
+  old_json:
+    required: false
+    description: 'old gas_report.json file path'
 runs:
   using: 'node16'
   main: 'dist/index.js'

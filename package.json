@@ -1,8 +1,8 @@
 {
-  "name": "typescript-action",
-  "version": "0.0.0",
+  "name": "cosm-orc-gas-diff-action",
+  "version": "0.1.0",
   "private": true,
-  "description": "TypeScript template action",
+  "description": "Github action that posts gas usage reports from cosm-orc as Github PR comments",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
@@ -10,12 +10,11 @@
     "format-check": "prettier --check '**/*.ts'",
     "lint": "eslint src/**/*.ts",
     "package": "ncc build --source-map --license licenses.txt",
-    "test": "jest",
     "all": "npm run build && npm run format && npm run lint && npm run package && npm test"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/de-husk/cosm-orc-gas-diff-action.git"
   },
   "keywords": [
     "actions",
@@ -25,7 +24,12 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+<<<<<<< HEAD
     "@actions/core": "^1.9.0"
+=======
+    "@actions/core": "^1.6.0",
+    "@actions/github": "^5.0.3"
+>>>>>>> 25bd4fc (intiial postGasCosts)
   },
   "devDependencies": {
     "@types/node": "^18.0.0",
@@ -33,11 +37,18 @@
     "@vercel/ncc": "^0.34.0",
     "eslint": "^7.32.0",
     "eslint-plugin-github": "^4.3.2",
+<<<<<<< HEAD
     "eslint-plugin-jest": "^26.5.3",
     "jest": "^27.2.5",
     "js-yaml": "^4.1.0",
     "prettier": "2.5.1",
     "ts-jest": "^27.1.2",
     "typescript": "^4.7.4"
+=======
+    "eslint-plugin-jest": "^25.3.2",
+    "js-yaml": "^4.1.0",
+    "prettier": "2.5.1",
+    "typescript": "^4.4.4"
+>>>>>>> 25bd4fc (intiial postGasCosts)
   }
 }
