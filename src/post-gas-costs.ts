@@ -1,6 +1,6 @@
 import {Context} from '@actions/github/lib/context'
 import {GitHub} from '@actions/github/lib/utils'
-import {readFileSync, readdirSync} from 'fs'
+import {readFileSync} from 'fs'
 
 export async function postUsage(
   current_json_path: string,
