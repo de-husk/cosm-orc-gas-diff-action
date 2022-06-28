@@ -7,7 +7,7 @@ Github action that posts gas usage reports from [cosm-orc](https://github.com/de
 - uses: de-husk/cosm-orc-gas-diff-action@v1
   with:
     repo_token: ${{ secrets.GITHUB_TOKEN }}
-    current_json: "current.json"
+    current_json: "./current.json"
 ```
 
 ## Build
