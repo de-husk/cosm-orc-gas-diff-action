@@ -1,16 +1,21 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import * as github from '@actions/github'
+
+import {postUsage} from './post-gas-costs'
 
 async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
+    const current: string = core.getInput('current_json', {required: true})
+    const old: string = core.getInput('old_json')
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    const github_token: string = core.getInput('repo_token', {required: true})
+    const octokit = github.getOctokit(github_token)
 
-    core.setOutput('time', new Date().toTimeString())
+    if (old) {
+      //postDiff(current, old)
+    } else {
+      postUsage(current, octokit, github.context)
+    }
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }

@@ -1,11 +1,20 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Cosm-orc Gas Diff Github Action'
+description: 'Github action that posts gas usage reports from cosm-orc as Github PR comments'
+author: 'de-husk'
+branding:
+  icon: "check"
+  color: "blue"
 inputs:
-  milliseconds: # change this
+  repo_token:
+    description: "Github token for the repo to allow posting a comment to the PR. Can be passed in using {{ secrets.GITHUB_TOKEN }}"
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+  # If you want to diff two gas reports also set `old` input.
+  current_json:
+    required: true
+    description: 'current gas report json file path'
+  old_json:
+    required: false
+    description: 'old gas report json file path'
 runs:
   using: 'node16'
   main: 'dist/index.js'

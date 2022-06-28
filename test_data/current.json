@@ -1,0 +1,12 @@
+{
+    "cw20_base": {
+        "Store": {
+            "gas_used": 27945129,
+            "gas_wanted": 41895529
+        },
+        "cw20_base::msg::InstantiateMsg": {
+            "gas_used": 161093,
+            "gas_wanted": 219607
+        }
+    }
+}
