@@ -115,7 +115,6 @@ function postUsage(current_json_path, github, context) {
 exports.postUsage = postUsage;
 function getGasUsage(json_file) {
     const data = (0, fs_1.readFileSync)(json_file, { encoding: 'utf8' });
-    console.log(data);
     return JSON.parse(data);
 }
 function buildComment(gasUsage, sha) {
@@ -123,15 +122,13 @@ function buildComment(gasUsage, sha) {
     ~ [Cosm-Orc](https://github.com/de-husk/cosm-orc) Gas Usage Report ~ \
     ![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png)
   `;
-    var commentData = `${sha}\n`;
-    for (var [contract, v] of Object.entries(gasUsage)) {
+    let commentData = `${sha}\n`;
+    for (let [contract, v] of Object.entries(gasUsage)) {
         commentData += `  * ${contract}:` + '\n';
-        console.log(v);
-        for (var [op_name, report] of Object.entries(v)) {
+        for (let [op_name, report] of Object.entries(v)) {
             commentData += `    * ${op_name}:` + '\n';
-            console.log(report);
-            commentData += `      * GasUsed: ${report.gas_used}:` + '\n';
-            commentData += `      * GasWanted: ${report.gas_wanted}:` + '\n';
+            commentData += `      * GasUsed: ${report.gas_used}` + '\n';
+            commentData += `      * GasWanted: ${report.gas_wanted}` + '\n';
         }
     }
     return commentHeader + '\n' + commentData;
