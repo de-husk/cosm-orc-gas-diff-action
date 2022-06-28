@@ -1,6 +1,6 @@
 import {Context} from '@actions/github/lib/context'
 import {GitHub} from '@actions/github/lib/utils'
-import {readFileSync} from 'fs'
+import {readFileSync, readdirSync} from 'fs'
 
 export async function postUsage(
   current_json_path: string,
@@ -49,6 +49,10 @@ interface GasReport {
 }
 
 function getGasUsage(json_file: string): Report {
+  // TODO: remove debug
+  const cwd = readdirSync('.', {encoding: 'utf8'})
+  console.log(cwd)
+
   const data = readFileSync(json_file, {encoding: 'utf8'})
   return JSON.parse(data)
 }

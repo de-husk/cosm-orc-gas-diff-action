@@ -114,6 +114,9 @@ function postUsage(current_json_path, github, context) {
 }
 exports.postUsage = postUsage;
 function getGasUsage(json_file) {
+    // TODO: remove debug
+    const cwd = (0, fs_1.readdirSync)('.', { encoding: 'utf8' });
+    console.log(cwd);
     const data = (0, fs_1.readFileSync)(json_file, { encoding: 'utf8' });
     return JSON.parse(data);
 }
