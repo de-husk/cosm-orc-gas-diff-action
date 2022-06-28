@@ -11,10 +11,10 @@ inputs:
   # If you want to diff two gas reports also set `old` input.
   current_json:
     required: true
-    description: 'current gas_report.json file path'
+    description: 'current gas report json file path'
   old_json:
     required: false
-    description: 'old gas_report.json file path'
+    description: 'old gas report json file path'
 runs:
   using: 'node16'
   main: 'dist/index.js'

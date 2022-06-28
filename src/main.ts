@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 
-import {postDiff, postUsage} from './postGasCosts'
+import {postUsage} from './post-gas-costs'
 
 async function run(): Promise<void> {
   try {
@@ -12,7 +12,7 @@ async function run(): Promise<void> {
     const octokit = github.getOctokit(github_token)
 
     if (old) {
-      postDiff(current, old)
+      //postDiff(current, old)
     } else {
       postUsage(current, octokit, github.context)
     }
