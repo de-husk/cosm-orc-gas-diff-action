@@ -7,7 +7,7 @@ Github action that posts gas usage reports from [cosm-orc](https://github.com/de
 - uses: de-husk/cosm-orc-gas-diff-action@v1
   with:
     repo_token: ${{ secrets.GITHUB_TOKEN }}
-    current_json: "./test_data/current.json"
+    current_json: "current.json"
 ```
 
 ## Build
@@ -25,7 +25,3 @@ Then run [ncc](https://github.com/zeit/ncc) and push the results:
 ```bash
 $ yarn run build && yarn run package
 ```
-
-## Release
-
-After testing you can [create a v1 tag](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md) to reference the stable and latest V1 action
