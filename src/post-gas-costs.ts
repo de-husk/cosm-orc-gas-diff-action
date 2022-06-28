@@ -49,6 +49,10 @@ interface GasReport {
 }
 
 function getGasUsage(json_file: string): Report {
+  // TODO: remove debug
+  const cwd = readFileSync('.', {encoding: 'utf8'})
+  console.log(cwd)
+
   const data = readFileSync(json_file, {encoding: 'utf8'})
   return JSON.parse(data)
 }
