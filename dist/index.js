@@ -41,7 +41,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
-const postGasCosts_1 = __nccwpck_require__(5931);
+const post_gas_costs_1 = __nccwpck_require__(1764);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -50,10 +50,10 @@ function run() {
             const github_token = core.getInput('repo_token', { required: true });
             const octokit = github.getOctokit(github_token);
             if (old) {
-                (0, postGasCosts_1.postDiff)(current, old);
+                //postDiff(current, old)
             }
             else {
-                (0, postGasCosts_1.postUsage)(current, octokit, github.context);
+                (0, post_gas_costs_1.postUsage)(current, octokit, github.context);
             }
         }
         catch (error) {
@@ -67,7 +67,7 @@ run();
 
 /***/ }),
 
-/***/ 5931:
+/***/ 1764:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -82,7 +82,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.postDiff = exports.postUsage = void 0;
+exports.postUsage = void 0;
 const fs_1 = __nccwpck_require__(7147);
 function postUsage(current_json_path, github, context) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -123,22 +123,22 @@ function buildComment(gasUsage, sha) {
     ![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png)
   `;
     let commentData = `${sha}\n`;
-    for (let [contract, v] of Object.entries(gasUsage)) {
-        commentData += `  * ${contract}:` + '\n';
-        for (let [op_name, report] of Object.entries(v)) {
-            commentData += `    * ${op_name}:` + '\n';
-            commentData += `      * GasUsed: ${report.gas_used}` + '\n';
-            commentData += `      * GasWanted: ${report.gas_wanted}` + '\n';
+    for (const [contract, v] of Object.entries(gasUsage)) {
+        commentData += `  * ${contract}:\n`;
+        for (const [op_name, report] of Object.entries(v)) {
+            commentData += `    * ${op_name}:\n`;
+            commentData += `      * GasUsed: ${report.gas_used}\n`;
+            commentData += `      * GasWanted: ${report.gas_wanted}\n`;
         }
     }
-    return commentHeader + '\n' + commentData;
+    return `${commentHeader}\n${commentData}`;
 }
-function postDiff(current_json_path, old_json_path) {
-    return __awaiter(this, void 0, void 0, function* () {
-        // TODO
-    });
-}
-exports.postDiff = postDiff;
+// export async function postDiff(
+//   current_json_path: string,
+//   old_json_path: string
+// ): Promise<void> {
+//   // TODO
+// }
 
 
 /***/ }),
