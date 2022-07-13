@@ -137,9 +137,11 @@ function calcDiff(curGasUsage, oldGasUsage) {
     for (const [contract, v] of Object.entries(curGasUsage)) {
         diffMap[contract] = {};
         for (const [op_name, report] of Object.entries(v)) {
-            const curUsage = report.gas_used;
-            const oldUsage = oldGasUsage[contract][op_name].gas_used;
-            diffMap[contract][op_name] = ((curUsage - oldUsage) / oldUsage) * 100;
+            if (oldGasUsage[contract] && oldGasUsage[contract][op_name]) {
+                const curUsage = report.gas_used;
+                const oldUsage = oldGasUsage[contract][op_name].gas_used;
+                diffMap[contract][op_name] = ((curUsage - oldUsage) / oldUsage) * 100;
+            }
         }
     }
     return diffMap;
@@ -156,7 +158,7 @@ function buildComment(gasUsage, sha, diffMap) {
             commentData += `    * ${op_name}:\n`;
             commentData += `      * GasUsed: ${report.gas_used}\n`;
             commentData += `      * GasWanted: ${report.gas_wanted}\n`;
-            if (diffMap) {
+            if (diffMap && diffMap[contract] && diffMap[contract][op_name]) {
                 commentData += `      * Diff: ${diffMap[contract][op_name]} %\n`;
             }
         }
