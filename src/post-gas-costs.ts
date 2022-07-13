@@ -2,6 +2,20 @@ import {Context} from '@actions/github/lib/context'
 import {GitHub} from '@actions/github/lib/utils'
 import {readFileSync} from 'fs'
 
+interface Report {
+  [contract: string]: GasReports
+}
+
+interface GasReports {
+  [operation: string]: GasReport
+}
+
+interface GasReport {
+  gas_used: number
+  gas_wanted: number
+  payload: string
+}
+
 export async function postUsage(
   current_json_path: string,
   github: InstanceType<typeof GitHub>,
@@ -9,7 +23,27 @@ export async function postUsage(
 ): Promise<void> {
   const gasUsage = getGasUsage(current_json_path)
   const commentBody = buildComment(gasUsage, context.sha)
+  await sendGithubComment(commentBody, github, context)
+}
 
+export async function postDiff(
+  current_json_path: string,
+  old_json_path: string,
+  github: InstanceType<typeof GitHub>,
+  context: Context
+): Promise<void> {
+  const curGasUsage = getGasUsage(current_json_path)
+  const oldGasUsage = getGasUsage(old_json_path)
+  const diffMap = calcDiff(curGasUsage, oldGasUsage)
+  const commentBody = buildComment(curGasUsage, context.sha, diffMap)
+  await sendGithubComment(commentBody, github, context)
+}
+
+async function sendGithubComment(
+  commentBody: string,
+  github: InstanceType<typeof GitHub>,
+  context: Context
+): Promise<void> {
   const {data: comments} = await github.rest.issues.listComments({
     issue_number: context.issue.number,
     owner: context.repo.owner,
@@ -35,25 +69,40 @@ export async function postUsage(
   }
 }
 
-interface Report {
-  [contract: string]: GasReports
-}
-
-interface GasReports {
-  [operation: string]: GasReport
-}
-
-interface GasReport {
-  gas_used: number
-  gas_wanted: number
-}
-
 function getGasUsage(json_file: string): Report {
   const data = readFileSync(json_file, {encoding: 'utf8'})
   return JSON.parse(data)
 }
 
-function buildComment(gasUsage: Report, sha: string): string {
+interface DiffMap {
+  [contract: string]: Diff
+}
+
+interface Diff {
+  [operation: string]: number
+}
+
+function calcDiff(curGasUsage: Report, oldGasUsage: Report): DiffMap {
+  const diffMap: DiffMap = {}
+
+  for (const [contract, v] of Object.entries(curGasUsage)) {
+    diffMap[contract] = {}
+
+    for (const [op_name, report] of Object.entries(v)) {
+      const curUsage = report.gas_used
+      const oldUsage = oldGasUsage[contract][op_name].gas_used
+      diffMap[contract][op_name] = ((curUsage - oldUsage) / oldUsage) * 100
+    }
+  }
+
+  return diffMap
+}
+
+function buildComment(
+  gasUsage: Report,
+  sha: string,
+  diffMap?: DiffMap
+): string {
   const commentHeader = `![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png) \
     ~ [Cosm-Orc](https://github.com/de-husk/cosm-orc) Gas Usage Report ~ \
     ![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png)
@@ -68,15 +117,12 @@ function buildComment(gasUsage: Report, sha: string): string {
       commentData += `    * ${op_name}:\n`
       commentData += `      * GasUsed: ${report.gas_used}\n`
       commentData += `      * GasWanted: ${report.gas_wanted}\n`
+
+      if (diffMap) {
+        commentData += `      * Diff: ${diffMap[contract][op_name]} %\n`
+      }
     }
   }
 
   return `${commentHeader}\n${commentData}`
 }
-
-// export async function postDiff(
-//   current_json_path: string,
-//   old_json_path: string
-// ): Promise<void> {
-//   // TODO
-// }

@@ -50,7 +50,7 @@ function run() {
             const github_token = core.getInput('repo_token', { required: true });
             const octokit = github.getOctokit(github_token);
             if (old) {
-                //postDiff(current, old)
+                (0, post_gas_costs_1.postDiff)(current, old, octokit, github.context);
             }
             else {
                 (0, post_gas_costs_1.postUsage)(current, octokit, github.context);
@@ -82,12 +82,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.postUsage = void 0;
+exports.postDiff = exports.postUsage = void 0;
 const fs_1 = __nccwpck_require__(7147);
 function postUsage(current_json_path, github, context) {
     return __awaiter(this, void 0, void 0, function* () {
         const gasUsage = getGasUsage(current_json_path);
         const commentBody = buildComment(gasUsage, context.sha);
+        yield sendGithubComment(commentBody, github, context);
+    });
+}
+exports.postUsage = postUsage;
+function postDiff(current_json_path, old_json_path, github, context) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const curGasUsage = getGasUsage(current_json_path);
+        const oldGasUsage = getGasUsage(old_json_path);
+        const diffMap = calcDiff(curGasUsage, oldGasUsage);
+        const commentBody = buildComment(curGasUsage, context.sha, diffMap);
+        yield sendGithubComment(commentBody, github, context);
+    });
+}
+exports.postDiff = postDiff;
+function sendGithubComment(commentBody, github, context) {
+    return __awaiter(this, void 0, void 0, function* () {
         const { data: comments } = yield github.rest.issues.listComments({
             issue_number: context.issue.number,
             owner: context.repo.owner,
@@ -112,12 +128,23 @@ function postUsage(current_json_path, github, context) {
         }
     });
 }
-exports.postUsage = postUsage;
 function getGasUsage(json_file) {
     const data = (0, fs_1.readFileSync)(json_file, { encoding: 'utf8' });
     return JSON.parse(data);
 }
-function buildComment(gasUsage, sha) {
+function calcDiff(curGasUsage, oldGasUsage) {
+    const diffMap = {};
+    for (const [contract, v] of Object.entries(curGasUsage)) {
+        diffMap[contract] = {};
+        for (const [op_name, report] of Object.entries(v)) {
+            const curUsage = report.gas_used;
+            const oldUsage = oldGasUsage[contract][op_name].gas_used;
+            diffMap[contract][op_name] = ((curUsage - oldUsage) / oldUsage) * 100;
+        }
+    }
+    return diffMap;
+}
+function buildComment(gasUsage, sha, diffMap) {
     const commentHeader = `![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png) \
     ~ [Cosm-Orc](https://github.com/de-husk/cosm-orc) Gas Usage Report ~ \
     ![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png)
@@ -129,16 +156,13 @@ function buildComment(gasUsage, sha) {
             commentData += `    * ${op_name}:\n`;
             commentData += `      * GasUsed: ${report.gas_used}\n`;
             commentData += `      * GasWanted: ${report.gas_wanted}\n`;
+            if (diffMap) {
+                commentData += `      * Diff: ${diffMap[contract][op_name]} %\n`;
+            }
         }
     }
     return `${commentHeader}\n${commentData}`;
 }
-// export async function postDiff(
-//   current_json_path: string,
-//   old_json_path: string
-// ): Promise<void> {
-//   // TODO
-// }
 
 
 /***/ }),
