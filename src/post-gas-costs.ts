@@ -83,7 +83,6 @@ interface Diff {
 }
 
 function calcDiff(curGasUsage: Report, oldGasUsage: Report): DiffMap {
-  // TODO: Once this is working dont make the diffMap an any type
   const diffMap: DiffMap = {}
 
   for (const [contract, v] of Object.entries(curGasUsage)) {
@@ -96,16 +95,9 @@ function calcDiff(curGasUsage: Report, oldGasUsage: Report): DiffMap {
     }
   }
 
-  /* eslint-disable no-console */
-  console.log(diffMap)
-  /* eslint-enable no-console */
-
   return diffMap
 }
 
-// TODO:
-// * Only show differences > 0.3% (or something)
-// * Show detailed report in a github comment spoiler markdown https://github.com/dear-github/dear-github/issues/166#issuecomment-866734459
 function buildComment(
   gasUsage: Report,
   sha: string,
