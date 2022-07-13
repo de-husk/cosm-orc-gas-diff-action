@@ -74,21 +74,31 @@ function getGasUsage(json_file: string): Report {
   return JSON.parse(data)
 }
 
-function calcDiff(curGasUsage: Report, oldGasUsage: Report): string {
+interface DiffMap {
+  [contract: string]: Diff
+}
+
+interface Diff {
+  [operation: string]: number
+}
+
+function calcDiff(curGasUsage: Report, oldGasUsage: Report): DiffMap {
   // TODO: Once this is working dont make the diffMap an any type
-  let diffMap: any = {}
+  const diffMap: DiffMap = {}
 
   for (const [contract, v] of Object.entries(curGasUsage)) {
     diffMap[contract] = {}
 
     for (const [op_name, report] of Object.entries(v)) {
-      let curUsage = report.gas_used
-      let oldUsage = oldGasUsage[contract][op_name].gas_used
-      diffMap[op_name] = ((curUsage - oldUsage) / oldUsage) * 100
+      const curUsage = report.gas_used
+      const oldUsage = oldGasUsage[contract][op_name].gas_used
+      diffMap[contract][op_name] = ((curUsage - oldUsage) / oldUsage) * 100
     }
   }
 
+  /* eslint-disable no-console */
   console.log(diffMap)
+  /* eslint-enable no-console */
 
   return diffMap
 }
@@ -96,7 +106,11 @@ function calcDiff(curGasUsage: Report, oldGasUsage: Report): string {
 // TODO:
 // * Only show differences > 0.3% (or something)
 // * Show detailed report in a github comment spoiler markdown https://github.com/dear-github/dear-github/issues/166#issuecomment-866734459
-function buildComment(gasUsage: Report, sha: string, diffMap?: any): string {
+function buildComment(
+  gasUsage: Report,
+  sha: string,
+  diffMap?: DiffMap
+): string {
   const commentHeader = `![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png) \
     ~ [Cosm-Orc](https://github.com/de-husk/cosm-orc) Gas Usage Report ~ \
     ![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png)

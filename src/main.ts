@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 
-import {postUsage, postDiff} from './post-gas-costs'
+import {postDiff, postUsage} from './post-gas-costs'
 
 async function run(): Promise<void> {
   try {
