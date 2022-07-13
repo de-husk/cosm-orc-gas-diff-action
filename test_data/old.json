@@ -1,8 +1,8 @@
 {
     "cw_core": {
         "cw_core::msg::ExecuteMsg__accept_admin_nomination#5392913272524087336": {
-            "gas_used": 129271,
-            "gas_wanted": 171834,
+            "gas_used": 500,
+            "gas_wanted": 800,
             "payload": "{\"accept_admin_nomination\":{}}"
         },
         "cw_core::msg::ExecuteMsg__execute_admin_msgs#12139312880455461867": {
