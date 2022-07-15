@@ -5,7 +5,7 @@
             "gas_wanted": 800,
             "payload": "{\"accept_admin_nomination\":{}}"
         },
-        "cw_core::msg::ExecuteMsg__execute_admin_msgs#12139312880455461867": {
+        "cw_core::msg::ExecuteMsg__execute_admin_msgs#121393128804554618": {
             "gas_used": 194840,
             "gas_wanted": 270184,
             "payload": "{\"execute_admin_msgs\":{\"msgs\":[{\"wasm\":{\"execute\":{\"contract_addr\":\"juno1v6thay2d8nty3yky8k0fpcm4zttcqxlmwdcn58e850n2ac0y9dtqqzcrxr\",\"funds\":[],\"msg\":\"eyJwYXVzZSI6eyJkdXJhdGlvbiI6eyJ0aW1lIjoxfX19\"}}}]}}"
