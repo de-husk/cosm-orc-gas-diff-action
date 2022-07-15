@@ -146,7 +146,6 @@ function buildComment(
       commentSpoiler += `    * ${op_name}:\n`
       commentSpoiler += `      * GasUsed: ${report.gas_used}\n`
       commentSpoiler += `      * GasWanted: ${report.gas_wanted}\n`
-      commentSpoiler += `      * Payload: ${report.payload}\n`
 
       if (diffMap && diffMap[contract] && diffMap[contract][op_name]) {
         commentSpoiler += `      * Diff: ${diffMap[contract][op_name]} %\n`
