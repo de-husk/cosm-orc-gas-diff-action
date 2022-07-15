@@ -166,7 +166,9 @@ function buildComment(gasUsage, sha, diffMap, oldGasUsage) {
                     commentBody += `      * New GasUsed: ${newReport.gas_used}\n`;
                     commentBody += `      * Old GasUsed: ${oldReport.gas_used}\n`;
                     commentBody += `      * Diff: ${diff} %\n`;
+                    commentBody += `      * File: ${newReport.file_name}:${newReport.file_number}\n`;
                 }
+                // TODO: add a github comment on this file / line number :D
             }
         }
     }
@@ -177,6 +179,7 @@ function buildComment(gasUsage, sha, diffMap, oldGasUsage) {
             commentSpoiler += `    * ${op_name}:\n`;
             commentSpoiler += `      * GasUsed: ${report.gas_used}\n`;
             commentSpoiler += `      * GasWanted: ${report.gas_wanted}\n`;
+            commentSpoiler += `      * File: ${report.file_name}:${report.file_number}\n`;
             if (diffMap && diffMap[contract] && diffMap[contract][op_name]) {
                 commentSpoiler += `      * Diff: ${diffMap[contract][op_name]} %\n`;
             }
