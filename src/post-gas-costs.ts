@@ -35,7 +35,12 @@ export async function postDiff(
   const curGasUsage = getGasUsage(current_json_path)
   const oldGasUsage = getGasUsage(old_json_path)
   const diffMap = calcDiff(curGasUsage, oldGasUsage)
-  const commentBody = buildComment(curGasUsage, context.sha, diffMap)
+  const commentBody = buildComment(
+    curGasUsage,
+    context.sha,
+    diffMap,
+    oldGasUsage
+  )
   await sendGithubComment(commentBody, github, context)
 }
 
@@ -103,28 +108,51 @@ function calcDiff(curGasUsage: Report, oldGasUsage: Report): DiffMap {
 function buildComment(
   gasUsage: Report,
   sha: string,
-  diffMap?: DiffMap
+  diffMap?: DiffMap,
+  oldGasUsage?: Report
 ): string {
   const commentHeader = `![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png) \
     ~ [Cosm-Orc](https://github.com/de-husk/cosm-orc) Gas Usage Report ~ \
     ![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png)
   `
 
-  let commentData = `${sha}\n`
+  // Only show diffs that are greater than `minDiffShowcase`
+  // the rest will be under the spoiler
+  const minDiffShowcase = 0.5
+  let commentBody = ''
+  if (diffMap && oldGasUsage) {
+    for (const [contract, v] of Object.entries(diffMap)) {
+      for (const [op_name, diff] of Object.entries(v)) {
+        if (Math.abs(diff) >= minDiffShowcase) {
+          const newReport = gasUsage[contract][op_name]
+          const oldReport = oldGasUsage[contract][op_name]
 
-  for (const [contract, v] of Object.entries(gasUsage)) {
-    commentData += `  * ${contract}:\n`
-
-    for (const [op_name, report] of Object.entries(v)) {
-      commentData += `    * ${op_name}:\n`
-      commentData += `      * GasUsed: ${report.gas_used}\n`
-      commentData += `      * GasWanted: ${report.gas_wanted}\n`
-
-      if (diffMap && diffMap[contract] && diffMap[contract][op_name]) {
-        commentData += `      * Diff: ${diffMap[contract][op_name]} %\n`
+          commentBody += `  * ${contract}:\n`
+          commentBody += `    * ${op_name}:\n`
+          commentBody += `      * New GasUsed: ${newReport.gas_used}\n`
+          commentBody += `      * Old GasUsed: ${oldReport.gas_used}\n`
+          commentBody += `      * Diff: ${diff} %\n`
+        }
       }
     }
   }
 
-  return `${commentHeader}\n${commentData}`
+  let commentSpoiler = `<details><summary>Raw Report for ${sha}</summary>\n\n`
+
+  for (const [contract, v] of Object.entries(gasUsage)) {
+    commentSpoiler += `  * ${contract}:\n`
+
+    for (const [op_name, report] of Object.entries(v)) {
+      commentSpoiler += `    * ${op_name}:\n`
+      commentSpoiler += `      * GasUsed: ${report.gas_used}\n`
+      commentSpoiler += `      * GasWanted: ${report.gas_wanted}\n`
+
+      if (diffMap && diffMap[contract] && diffMap[contract][op_name]) {
+        commentSpoiler += `      * Diff: ${diffMap[contract][op_name]} %\n`
+      }
+    }
+  }
+  commentSpoiler += '</details>'
+
+  return `${commentHeader}\n${commentBody}\n\n${commentSpoiler}`
 }
