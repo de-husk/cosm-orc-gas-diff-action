@@ -137,7 +137,7 @@ function buildComment(
     }
   }
 
-  let commentSpoiler = `<details><summary>Raw Report for ${sha}</summary>\n`
+  let commentSpoiler = `<details><summary>Raw Report for ${sha}</summary>\n\n`
 
   for (const [contract, v] of Object.entries(gasUsage)) {
     commentSpoiler += `  * ${contract}:\n`
