@@ -140,6 +140,36 @@ function sendGithubIssueComment(commentBody, github, context) {
         }
     });
 }
+function sendGithubPRComment(commentBody, file, line_number, sha, github, context) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const { data: comments } = yield github.rest.pulls.listReviewComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number: context.issue.number
+        });
+        const botComment = comments.find(comment => { var _a; return ((_a = comment === null || comment === void 0 ? void 0 : comment.user) === null || _a === void 0 ? void 0 : _a.id) === 41898282; });
+        if (botComment) {
+            // TODO: Delete a comment if gas diff is no longer offending
+            yield github.rest.pulls.updateReviewComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: commentBody
+            });
+        }
+        else {
+            yield github.rest.pulls.createReviewComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.issue.number,
+                body: commentBody,
+                path: file,
+                line: line_number,
+                commit_id: sha
+            });
+        }
+    });
+}
 function getGasUsage(json_file) {
     const data = (0, fs_1.readFileSync)(json_file, { encoding: 'utf8' });
     return JSON.parse(data);
@@ -180,6 +210,7 @@ function buildComment(gasUsage, sha, github, context, diffMap, oldGasUsage) {
                         commentBody += `      * Old GasUsed: ${oldReport.gas_used}\n`;
                         commentBody += `      * Diff: ${diff} %\n`;
                         commentBody += `      * File: ${newReport.file_name}:${newReport.line_number}\n`;
+                        yield sendGithubPRComment(commentBody, newReport.file_name, newReport.line_number, sha, github, context);
                     }
                 }
             }
