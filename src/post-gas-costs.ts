@@ -92,43 +92,6 @@ async function sendGithubIssueComment(
   }
 }
 
-async function sendGithubPRComment(
-  commentBody: string,
-  file: string,
-  line_number: number,
-  sha: string,
-  github: InstanceType<typeof GitHub>,
-  context: Context
-): Promise<void> {
-  const {data: comments} = await github.rest.pulls.listReviewComments({
-    owner: context.repo.owner,
-    repo: context.repo.repo,
-    pull_number: context.issue.number
-  })
-
-  const botComment = comments.find(comment => comment?.user?.id === 41898282)
-
-  if (botComment) {
-    // TODO: Delete a comment if gas diff is no longer offending
-    await github.rest.pulls.updateReviewComment({
-      owner: context.repo.owner,
-      repo: context.repo.repo,
-      comment_id: botComment.id,
-      body: commentBody
-    })
-  } else {
-    await github.rest.pulls.createReviewComment({
-      owner: context.repo.owner,
-      repo: context.repo.repo,
-      pull_number: context.issue.number,
-      body: commentBody,
-      path: file,
-      line: line_number,
-      commit_id: sha
-    })
-  }
-}
-
 function getGasUsage(json_file: string): Report {
   const data = readFileSync(json_file, {encoding: 'utf8'})
   return JSON.parse(data)
@@ -190,15 +153,6 @@ async function buildComment(
           commentBody += `      * Old GasUsed: ${oldReport.gas_used}\n`
           commentBody += `      * Diff: ${diff} %\n`
           commentBody += `      * File: ${newReport.file_name}:${newReport.line_number}\n`
-
-          await sendGithubPRComment(
-            commentBody,
-            newReport.file_name,
-            newReport.line_number,
-            sha,
-            github,
-            context
-          )
         }
       }
     }
