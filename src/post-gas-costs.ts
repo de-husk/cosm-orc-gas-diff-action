@@ -1,6 +1,6 @@
-import { Context } from '@actions/github/lib/context'
-import { GitHub } from '@actions/github/lib/utils'
-import { readFileSync } from 'fs'
+import {Context} from '@actions/github/lib/context'
+import {GitHub} from '@actions/github/lib/utils'
+import {readFileSync} from 'fs'
 
 interface Report {
   [contract: string]: GasReports
@@ -49,7 +49,7 @@ async function sendGithubComment(
   github: InstanceType<typeof GitHub>,
   context: Context
 ): Promise<void> {
-  const { data: comments } = await github.rest.issues.listComments({
+  const {data: comments} = await github.rest.issues.listComments({
     issue_number: context.issue.number,
     owner: context.repo.owner,
     repo: context.repo.repo
@@ -75,7 +75,7 @@ async function sendGithubComment(
 }
 
 function getGasUsage(json_file: string): Report {
-  const data = readFileSync(json_file, { encoding: 'utf8' })
+  const data = readFileSync(json_file, {encoding: 'utf8'})
   return JSON.parse(data)
 }
 
