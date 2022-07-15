@@ -23,8 +23,9 @@ export async function postUsage(
   github: InstanceType<typeof GitHub>,
   context: Context
 ): Promise<void> {
+  const sha = await getGithubPRSha(github, context)
   const gasUsage = getGasUsage(current_json_path)
-  const commentBody = await buildComment(gasUsage, context.sha, github, context)
+  const commentBody = await buildComment(gasUsage, sha, github, context)
   await sendGithubIssueComment(commentBody, github, context)
 }
 
@@ -34,18 +35,31 @@ export async function postDiff(
   github: InstanceType<typeof GitHub>,
   context: Context
 ): Promise<void> {
+  const sha = await getGithubPRSha(github, context)
   const curGasUsage = getGasUsage(current_json_path)
   const oldGasUsage = getGasUsage(old_json_path)
   const diffMap = calcDiff(curGasUsage, oldGasUsage)
   const commentBody = await buildComment(
     curGasUsage,
-    context.sha,
+    sha,
     github,
     context,
     diffMap,
     oldGasUsage
   )
   await sendGithubIssueComment(commentBody, github, context)
+}
+
+async function getGithubPRSha(
+  github: InstanceType<typeof GitHub>,
+  context: Context
+): Promise<string> {
+  const pr = await github.rest.pulls.get({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    pull_number: context.issue.number
+  })
+  return pr.data.head.sha
 }
 
 async function sendGithubIssueComment(
@@ -82,6 +96,7 @@ async function sendGithubPRComment(
   commentBody: string,
   file: string,
   line_number: number,
+  sha: string,
   github: InstanceType<typeof GitHub>,
   context: Context
 ): Promise<void> {
@@ -109,7 +124,7 @@ async function sendGithubPRComment(
       body: commentBody,
       path: file,
       line: line_number,
-      commit_id: context.sha
+      commit_id: sha
     })
   }
 }
@@ -180,6 +195,7 @@ async function buildComment(
             commentBody,
             newReport.file_name,
             newReport.line_number,
+            sha,
             github,
             context
           )
