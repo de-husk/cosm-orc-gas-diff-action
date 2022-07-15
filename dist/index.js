@@ -128,7 +128,7 @@ function sendGithubIssueComment(commentBody, github, context) {
         }
     });
 }
-function sendGithubPRComment(commentBody, github, context) {
+function sendGithubPRComment(commentBody, file, line_number, github, context) {
     return __awaiter(this, void 0, void 0, function* () {
         const { data: comments } = yield github.rest.pulls.listReviewComments({
             owner: context.repo.owner,
@@ -150,7 +150,10 @@ function sendGithubPRComment(commentBody, github, context) {
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 pull_number: context.issue.number,
-                body: commentBody
+                body: commentBody,
+                path: file,
+                line: line_number,
+                commit_id: context.sha
             });
         }
     });
@@ -195,8 +198,8 @@ function buildComment(gasUsage, sha, github, context, diffMap, oldGasUsage) {
                         commentBody += `      * Old GasUsed: ${oldReport.gas_used}\n`;
                         commentBody += `      * Diff: ${diff} %\n`;
                         commentBody += `      * File: ${newReport.file_name}:${newReport.line_number}\n`;
+                        yield sendGithubPRComment(commentBody, newReport.file_name, newReport.line_number, github, context);
                     }
-                    yield sendGithubPRComment(commentBody, github, context);
                 }
             }
         }
