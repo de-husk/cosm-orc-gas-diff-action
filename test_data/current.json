@@ -1,35 +1,35 @@
 {
     "cw_core": {
-        "cw_core::msg::ExecuteMsg__/dao-contracts/dao-contracts/ci/gas_benchmarks/src/main.rs:124[3]": {
-            "file_name": "/dao-contracts/dao-contracts/ci/gas_benchmarks/src/main.rs",
+        "cw_core::msg::ExecuteMsg__src/main.ts:5[3]": {
+            "file_name": "src/main.ts",
             "gas_used": 130173,
             "gas_wanted": 173275,
             "line_number": 124,
             "payload": "{\"nominate_admin\":{\"admin\":\"juno1ft5zfffrgtm2u72cup9e2ecfxjwz8ztc929cgj\"}}"
         },
-        "cw_core::msg::ExecuteMsg__/dao-contracts/dao-contracts/ci/gas_benchmarks/src/main.rs:124[5]": {
-            "file_name": "/dao-contracts/dao-contracts/ci/gas_benchmarks/src/main.rs",
+        "cw_core::msg::ExecuteMsg__src/main.ts:5[5]": {
+            "file_name": "src/main.ts",
             "gas_used": 129313,
             "gas_wanted": 171987,
             "line_number": 124,
             "payload": "{\"accept_admin_nomination\":{}}"
         },
-        "cw_core::msg::ExecuteMsg__/dao-contracts/dao-contracts/ci/gas_benchmarks/src/main.rs:124[6]": {
-            "file_name": "/dao-contracts/dao-contracts/ci/gas_benchmarks/src/main.rs",
+        "cw_core::msg::ExecuteMsg__src/main.ts:5[6]": {
+            "file_name": "src/main.ts",
             "gas_used": 130173,
             "gas_wanted": 173275,
             "line_number": 124,
             "payload": "{\"nominate_admin\":{\"admin\":\"juno1ft5zfffrgtm2u72cup9e2ecfxjwz8ztc929cgj\"}}"
         },
-        "cw_core::msg::ExecuteMsg__/dao-contracts/dao-contracts/ci/gas_benchmarks/src/main.rs:124[7]": {
-            "file_name": "/dao-contracts/dao-contracts/ci/gas_benchmarks/src/main.rs",
+        "cw_core::msg::ExecuteMsg_src/main.ts:5[7]": {
+            "file_name": "src/main.ts",
             "gas_used": 126091,
             "gas_wanted": 167152,
             "line_number": 124,
             "payload": "{\"withdraw_admin_nomination\":{}}"
         },
-        "cw_core::msg::InstantiateMsg__/dao-contracts/dao-contracts/ci/gas_benchmarks/src/main.rs:124[0]": {
-            "file_name": "/dao-contracts/dao-contracts/ci/gas_benchmarks/src/main.rs",
+        "cw_core::msg::InstantiateMsg__src/main.ts:5[0]": {
+            "file_name": "src/main.ts",
             "gas_used": 939445,
             "gas_wanted": 1387086,
             "line_number": 124,
