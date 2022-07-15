@@ -15,7 +15,7 @@ interface GasReport {
   gas_wanted: number
   payload: string
   file_name: string
-  file_number: number
+  line_number: number
 }
 
 export async function postUsage(
@@ -24,8 +24,8 @@ export async function postUsage(
   context: Context
 ): Promise<void> {
   const gasUsage = getGasUsage(current_json_path)
-  const commentBody = buildComment(gasUsage, context.sha)
-  await sendGithubComment(commentBody, github, context)
+  const commentBody = await buildComment(gasUsage, context.sha, github, context)
+  await sendGithubIssueComment(commentBody, github, context)
 }
 
 export async function postDiff(
@@ -37,16 +37,18 @@ export async function postDiff(
   const curGasUsage = getGasUsage(current_json_path)
   const oldGasUsage = getGasUsage(old_json_path)
   const diffMap = calcDiff(curGasUsage, oldGasUsage)
-  const commentBody = buildComment(
+  const commentBody = await buildComment(
     curGasUsage,
     context.sha,
+    github,
+    context,
     diffMap,
     oldGasUsage
   )
-  await sendGithubComment(commentBody, github, context)
+  await sendGithubIssueComment(commentBody, github, context)
 }
 
-async function sendGithubComment(
+async function sendGithubIssueComment(
   commentBody: string,
   github: InstanceType<typeof GitHub>,
   context: Context
@@ -72,6 +74,42 @@ async function sendGithubComment(
       owner: context.repo.owner,
       repo: context.repo.repo,
       body: commentBody
+    })
+  }
+}
+
+async function sendGithubPRComment(
+  commentBody: string,
+  file: string,
+  line_number: number,
+  github: InstanceType<typeof GitHub>,
+  context: Context
+): Promise<void> {
+  const {data: comments} = await github.rest.pulls.listReviewComments({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    pull_number: context.issue.number
+  })
+
+  const botComment = comments.find(comment => comment?.user?.id === 41898282)
+
+  if (botComment) {
+    // TODO: Delete a comment if gas diff is no longer offending
+    await github.rest.pulls.updateReviewComment({
+      owner: context.repo.owner,
+      repo: context.repo.repo,
+      comment_id: botComment.id,
+      body: commentBody
+    })
+  } else {
+    await github.rest.pulls.createReviewComment({
+      owner: context.repo.owner,
+      repo: context.repo.repo,
+      pull_number: context.issue.number,
+      body: commentBody,
+      path: file,
+      line: line_number,
+      commit_id: context.sha
     })
   }
 }
@@ -107,12 +145,14 @@ function calcDiff(curGasUsage: Report, oldGasUsage: Report): DiffMap {
   return diffMap
 }
 
-function buildComment(
+async function buildComment(
   gasUsage: Report,
   sha: string,
+  github: InstanceType<typeof GitHub>,
+  context: Context,
   diffMap?: DiffMap,
   oldGasUsage?: Report
-): string {
+): Promise<string> {
   const commentHeader = `![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png) \
     ~ [Cosm-Orc](https://github.com/de-husk/cosm-orc) Gas Usage Report ~ \
     ![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png)
@@ -134,10 +174,16 @@ function buildComment(
           commentBody += `      * New GasUsed: ${newReport.gas_used}\n`
           commentBody += `      * Old GasUsed: ${oldReport.gas_used}\n`
           commentBody += `      * Diff: ${diff} %\n`
-          commentBody += `      * File: ${newReport.file_name}:${newReport.file_number}\n`
-        }
+          commentBody += `      * File: ${newReport.file_name}:${newReport.line_number}\n`
 
-        // TODO: add a github comment on this file / line number :D
+          await sendGithubPRComment(
+            commentBody,
+            newReport.file_name,
+            newReport.line_number,
+            github,
+            context
+          )
+        }
       }
     }
   }
@@ -151,7 +197,7 @@ function buildComment(
       commentSpoiler += `    * ${op_name}:\n`
       commentSpoiler += `      * GasUsed: ${report.gas_used}\n`
       commentSpoiler += `      * GasWanted: ${report.gas_wanted}\n`
-      commentSpoiler += `      * File: ${report.file_name}:${report.file_number}\n`
+      commentSpoiler += `      * File: ${report.file_name}:${report.line_number}\n`
 
       if (diffMap && diffMap[contract] && diffMap[contract][op_name]) {
         commentSpoiler += `      * Diff: ${diffMap[contract][op_name]} %\n`
