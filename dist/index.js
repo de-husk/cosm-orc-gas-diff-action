@@ -170,8 +170,7 @@ function buildComment(gasUsage, sha, diffMap, oldGasUsage) {
             }
         }
     }
-    // TODO: Put below in a spoiler message
-    let commentSpoiler = `${sha}\n`;
+    let commentSpoiler = `<details><summary>Raw Report for ${sha}</summary>\n`;
     for (const [contract, v] of Object.entries(gasUsage)) {
         commentSpoiler += `  * ${contract}:\n`;
         for (const [op_name, report] of Object.entries(v)) {
@@ -184,6 +183,7 @@ function buildComment(gasUsage, sha, diffMap, oldGasUsage) {
             }
         }
     }
+    commentSpoiler += '</details>';
     return `${commentHeader}\n${commentBody}\n\n${commentSpoiler}`;
 }
 
