@@ -1,13 +1,13 @@
 {
     "cw_core": {
-        "cw_core::msg::ExecuteMsg__/dao-contracts/ci/gas_benchmarks/src/main.rs:124[3]": {
+        "cw_core::msg::ExecuteMsg__/dao-contracts/dao-contracts/ci/gas_benchmarks/src/main.rs:124[3]": {
             "file_name": "/dao-contracts/dao-contracts/ci/gas_benchmarks/src/main.rs",
             "gas_used": 130173,
             "gas_wanted": 173275,
             "line_number": 124,
             "payload": "{\"nominate_admin\":{\"admin\":\"juno1ft5zfffrgtm2u72cup9e2ecfxjwz8ztc929cgj\"}}"
         },
-        "cw_core::msg::ExecuteMsg__/dao-contracts/ci/gas_benchmarks/src/main.rs:124[5]": {
+        "cw_core::msg::ExecuteMsg__/dao-contracts/dao-contracts/ci/gas_benchmarks/src/main.rs:124[5]": {
             "file_name": "/dao-contracts/dao-contracts/ci/gas_benchmarks/src/main.rs",
             "gas_used": 129313,
             "gas_wanted": 171987,
