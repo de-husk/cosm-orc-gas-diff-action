@@ -86,23 +86,35 @@ exports.postDiff = exports.postUsage = void 0;
 const fs_1 = __nccwpck_require__(7147);
 function postUsage(current_json_path, github, context) {
     return __awaiter(this, void 0, void 0, function* () {
+        const sha = yield getGithubPRSha(github, context);
         const gasUsage = getGasUsage(current_json_path);
-        const commentBody = buildComment(gasUsage, context.sha);
-        yield sendGithubComment(commentBody, github, context);
+        const commentBody = yield buildComment(gasUsage, sha, github, context);
+        yield sendGithubIssueComment(commentBody, github, context);
     });
 }
 exports.postUsage = postUsage;
 function postDiff(current_json_path, old_json_path, github, context) {
     return __awaiter(this, void 0, void 0, function* () {
+        const sha = yield getGithubPRSha(github, context);
         const curGasUsage = getGasUsage(current_json_path);
         const oldGasUsage = getGasUsage(old_json_path);
         const diffMap = calcDiff(curGasUsage, oldGasUsage);
-        const commentBody = buildComment(curGasUsage, context.sha, diffMap, oldGasUsage);
-        yield sendGithubComment(commentBody, github, context);
+        const commentBody = yield buildComment(curGasUsage, sha, github, context, diffMap, oldGasUsage);
+        yield sendGithubIssueComment(commentBody, github, context);
     });
 }
 exports.postDiff = postDiff;
-function sendGithubComment(commentBody, github, context) {
+function getGithubPRSha(github, context) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const pr = yield github.rest.pulls.get({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number: context.issue.number
+        });
+        return pr.data.head.sha;
+    });
+}
+function sendGithubIssueComment(commentBody, github, context) {
     return __awaiter(this, void 0, void 0, function* () {
         const { data: comments } = yield github.rest.issues.listComments({
             issue_number: context.issue.number,
@@ -146,44 +158,48 @@ function calcDiff(curGasUsage, oldGasUsage) {
     }
     return diffMap;
 }
-function buildComment(gasUsage, sha, diffMap, oldGasUsage) {
-    const commentHeader = `![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png) \
+function buildComment(gasUsage, sha, github, context, diffMap, oldGasUsage) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const commentHeader = `![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png) \
     ~ [Cosm-Orc](https://github.com/de-husk/cosm-orc) Gas Usage Report ~ \
     ![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png)
   `;
-    // Only show diffs that are greater than `minDiffShowcase`
-    // the rest will be under the spoiler
-    const minDiffShowcase = 0.5;
-    let commentBody = '';
-    if (diffMap && oldGasUsage) {
-        for (const [contract, v] of Object.entries(diffMap)) {
-            for (const [op_name, diff] of Object.entries(v)) {
-                if (Math.abs(diff) >= minDiffShowcase) {
-                    const newReport = gasUsage[contract][op_name];
-                    const oldReport = oldGasUsage[contract][op_name];
-                    commentBody += `  * ${contract}:\n`;
-                    commentBody += `    * ${op_name}:\n`;
-                    commentBody += `      * New GasUsed: ${newReport.gas_used}\n`;
-                    commentBody += `      * Old GasUsed: ${oldReport.gas_used}\n`;
-                    commentBody += `      * Diff: ${diff} %\n`;
+        // Only show diffs that are greater than `minDiffShowcase`
+        // the rest will be under the spoiler
+        const minDiffShowcase = 0.5;
+        let commentBody = '';
+        if (diffMap && oldGasUsage) {
+            for (const [contract, v] of Object.entries(diffMap)) {
+                for (const [op_name, diff] of Object.entries(v)) {
+                    if (Math.abs(diff) >= minDiffShowcase) {
+                        const newReport = gasUsage[contract][op_name];
+                        const oldReport = oldGasUsage[contract][op_name];
+                        commentBody += `  * ${contract}:\n`;
+                        commentBody += `    * ${op_name}:\n`;
+                        commentBody += `      * New GasUsed: ${newReport.gas_used}\n`;
+                        commentBody += `      * Old GasUsed: ${oldReport.gas_used}\n`;
+                        commentBody += `      * Diff: ${diff} %\n`;
+                        commentBody += `      * File: ${newReport.file_name}:${newReport.line_number}\n`;
+                    }
                 }
             }
         }
-    }
-    let commentSpoiler = `<details><summary>Raw Report for ${sha}</summary>\n\n`;
-    for (const [contract, v] of Object.entries(gasUsage)) {
-        commentSpoiler += `  * ${contract}:\n`;
-        for (const [op_name, report] of Object.entries(v)) {
-            commentSpoiler += `    * ${op_name}:\n`;
-            commentSpoiler += `      * GasUsed: ${report.gas_used}\n`;
-            commentSpoiler += `      * GasWanted: ${report.gas_wanted}\n`;
-            if (diffMap && diffMap[contract] && diffMap[contract][op_name]) {
-                commentSpoiler += `      * Diff: ${diffMap[contract][op_name]} %\n`;
+        let commentSpoiler = `<details><summary>Raw Report for ${sha}</summary>\n\n`;
+        for (const [contract, v] of Object.entries(gasUsage)) {
+            commentSpoiler += `  * ${contract}:\n`;
+            for (const [op_name, report] of Object.entries(v)) {
+                commentSpoiler += `    * ${op_name}:\n`;
+                commentSpoiler += `      * GasUsed: ${report.gas_used}\n`;
+                commentSpoiler += `      * GasWanted: ${report.gas_wanted}\n`;
+                commentSpoiler += `      * File: ${report.file_name}:${report.line_number}\n`;
+                if (diffMap && diffMap[contract] && diffMap[contract][op_name]) {
+                    commentSpoiler += `      * Diff: ${diffMap[contract][op_name]} %\n`;
+                }
             }
         }
-    }
-    commentSpoiler += '</details>';
-    return `${commentHeader}\n${commentBody}\n\n${commentSpoiler}`;
+        commentSpoiler += '</details>';
+        return `${commentHeader}\n${commentBody}\n\n${commentSpoiler}`;
+    });
 }
 
 

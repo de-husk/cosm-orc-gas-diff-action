@@ -14,6 +14,8 @@ interface GasReport {
   gas_used: number
   gas_wanted: number
   payload: string
+  file_name: string
+  line_number: number
 }
 
 export async function postUsage(
@@ -21,9 +23,10 @@ export async function postUsage(
   github: InstanceType<typeof GitHub>,
   context: Context
 ): Promise<void> {
+  const sha = await getGithubPRSha(github, context)
   const gasUsage = getGasUsage(current_json_path)
-  const commentBody = buildComment(gasUsage, context.sha)
-  await sendGithubComment(commentBody, github, context)
+  const commentBody = await buildComment(gasUsage, sha, github, context)
+  await sendGithubIssueComment(commentBody, github, context)
 }
 
 export async function postDiff(
@@ -32,19 +35,34 @@ export async function postDiff(
   github: InstanceType<typeof GitHub>,
   context: Context
 ): Promise<void> {
+  const sha = await getGithubPRSha(github, context)
   const curGasUsage = getGasUsage(current_json_path)
   const oldGasUsage = getGasUsage(old_json_path)
   const diffMap = calcDiff(curGasUsage, oldGasUsage)
-  const commentBody = buildComment(
+  const commentBody = await buildComment(
     curGasUsage,
-    context.sha,
+    sha,
+    github,
+    context,
     diffMap,
     oldGasUsage
   )
-  await sendGithubComment(commentBody, github, context)
+  await sendGithubIssueComment(commentBody, github, context)
 }
 
-async function sendGithubComment(
+async function getGithubPRSha(
+  github: InstanceType<typeof GitHub>,
+  context: Context
+): Promise<string> {
+  const pr = await github.rest.pulls.get({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    pull_number: context.issue.number
+  })
+  return pr.data.head.sha
+}
+
+async function sendGithubIssueComment(
   commentBody: string,
   github: InstanceType<typeof GitHub>,
   context: Context
@@ -105,12 +123,14 @@ function calcDiff(curGasUsage: Report, oldGasUsage: Report): DiffMap {
   return diffMap
 }
 
-function buildComment(
+async function buildComment(
   gasUsage: Report,
   sha: string,
+  github: InstanceType<typeof GitHub>,
+  context: Context,
   diffMap?: DiffMap,
   oldGasUsage?: Report
-): string {
+): Promise<string> {
   const commentHeader = `![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png) \
     ~ [Cosm-Orc](https://github.com/de-husk/cosm-orc) Gas Usage Report ~ \
     ![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png)
@@ -132,6 +152,7 @@ function buildComment(
           commentBody += `      * New GasUsed: ${newReport.gas_used}\n`
           commentBody += `      * Old GasUsed: ${oldReport.gas_used}\n`
           commentBody += `      * Diff: ${diff} %\n`
+          commentBody += `      * File: ${newReport.file_name}:${newReport.line_number}\n`
         }
       }
     }
@@ -146,6 +167,7 @@ function buildComment(
       commentSpoiler += `    * ${op_name}:\n`
       commentSpoiler += `      * GasUsed: ${report.gas_used}\n`
       commentSpoiler += `      * GasWanted: ${report.gas_wanted}\n`
+      commentSpoiler += `      * File: ${report.file_name}:${report.line_number}\n`
 
       if (diffMap && diffMap[contract] && diffMap[contract][op_name]) {
         commentSpoiler += `      * Diff: ${diffMap[contract][op_name]} %\n`
