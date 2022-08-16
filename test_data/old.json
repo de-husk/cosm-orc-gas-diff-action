@@ -1,39 +1,190 @@
 {
+    "cw20_base": {
+        "Store__Store": {
+            "file_name": "src/main.ts",
+            "gas_used": 29745255,
+            "gas_wanted": 44593571,
+            "line_number": 8
+        },
+        "Execute__exc_stake_stake_tokens": {
+            "file_name": "ci/integration_tests/src/tests/cw20_stake_test.rs",
+            "gas_used": 234585,
+            "gas_wanted": 319232,
+            "line_number": 75
+        }
+    },
+    "cw20_stake": {
+        "Store__Store": {
+            "file_name": "ci/integration_tests/src/helpers/chain.rs",
+            "gas_used": 27808090,
+            "gas_wanted": 41687495,
+            "line_number": 84
+        }
+    },
+    "cw20_staked_balance_voting": {
+        "Store__Store": {
+            "file_name": "ci/integration_tests/src/helpers/chain.rs",
+            "gas_used": 29274830,
+            "gas_wanted": 43887605,
+            "line_number": 84
+        }
+    },
+    "cw4_group": {
+        "Store__Store": {
+            "file_name": "ci/integration_tests/src/helpers/chain.rs",
+            "gas_used": 21817380,
+            "gas_wanted": 32701430,
+            "line_number": 84
+        }
+    },
+    "cw4_voting": {
+        "Store__Store": {
+            "file_name": "ci/integration_tests/src/helpers/chain.rs",
+            "gas_used": 21731910,
+            "gas_wanted": 32573225,
+            "line_number": 84
+        }
+    },
+    "cw721_stake": {
+        "Store__Store": {
+            "file_name": "ci/integration_tests/src/helpers/chain.rs",
+            "gas_used": 30924940,
+            "gas_wanted": 46362770,
+            "line_number": 84
+        }
+    },
+    "cw_admin_factory": {
+        "Store__Store": {
+            "file_name": "ci/integration_tests/src/helpers/chain.rs",
+            "gas_used": 15962740,
+            "gas_wanted": 23919470,
+            "line_number": 84
+        }
+    },
     "cw_core": {
-        "cw_core::msg::ExecuteMsg__/dao-contracts/dao-contracts/ci/gas_benchmarks/src/main.rs:124[3]": {
-            "file_name": "/dao-contracts/dao-contracts/ci/gas_benchmarks/src/main.rs",
-            "gas_used": 9000000,
-            "gas_wanted": 173275,
-            "line_number": 124,
-            "payload": "{\"nominate_admin\":{\"admin\":\"juno1ft5zfffrgtm2u72cup9e2ecfxjwz8ztc929cgj\"}}"
+        "Store__Store": {
+            "file_name": "ci/integration_tests/src/helpers/chain.rs",
+            "gas_used": 40277910,
+            "gas_wanted": 60392225,
+            "line_number": 84
         },
-        "cw_core::msg::ExecuteMsg__/dao-contracts/dao-contracts/ci/gas_benchmarks/src/main.rs:124[5]": {
-            "file_name": "/dao-contracts/dao-contracts/ci/gas_benchmarks/src/main.rs",
-            "gas_used": 129313,
-            "gas_wanted": 171987,
-            "line_number": 124,
-            "payload": "{\"accept_admin_nomination\":{}}"
+        "Execute__exc_admin_msgs_pause_dao": {
+            "file_name": "ci/integration_tests/src/tests/cw_core_test.rs",
+            "gas_used": 194386,
+            "gas_wanted": 267068,
+            "line_number": 73
         },
-        "cw_core::msg::ExecuteMsg__/dao-contracts/dao-contracts/ci/gas_benchmarks/src/main.rs:124[6]": {
-            "file_name": "/dao-contracts/dao-contracts/ci/gas_benchmarks/src/main.rs",
-            "gas_used": 130173,
-            "gas_wanted": 173275,
-            "line_number": 124,
-            "payload": "{\"nominate_admin\":{\"admin\":\"juno1ft5zfffrgtm2u72cup9e2ecfxjwz8ztc929cgj\"}}"
+        "Instantiate__exc_admin_msgs_create_dao": {
+            "file_name": "ci/integration_tests/src/helpers/helper.rs",
+            "gas_used": 953358,
+            "gas_wanted": 1405428,
+            "line_number": 86
         },
-        "cw_core::msg::ExecuteMsg__/dao-contracts/dao-contracts/ci/gas_benchmarks/src/main.rs:124[7]": {
-            "file_name": "/dao-contracts/dao-contracts/ci/gas_benchmarks/src/main.rs",
-            "gas_used": 126091,
-            "gas_wanted": 167152,
-            "line_number": 124,
-            "payload": "{\"withdraw_admin_nomination\":{}}"
+        "Instantiate__exc_admin_msgs_create_dao_with_admin": {
+            "file_name": "ci/integration_tests/src/helpers/helper.rs",
+            "gas_used": 954408,
+            "gas_wanted": 1407003,
+            "line_number": 86
         },
-        "cw_core::msg::InstantiateMsg__/dao-contracts/dao-contracts/ci/gas_benchmarks/src/main.rs:124[0]": {
-            "file_name": "/dao-contracts/dao-contracts/ci/gas_benchmarks/src/main.rs",
-            "gas_used": 939445,
-            "gas_wanted": 1387086,
-            "line_number": 124,
-            "payload": "{\"admin\":\"juno1ft5zfffrgtm2u72cup9e2ecfxjwz8ztc929cgj\",\"automatically_add_cw20s\":false,\"automatically_add_cw721s\":false,\"description\":\"A DAO that makes DAO tooling\",\"image_url\":null,\"initial_items\":null,\"name\":\"DAO DAO\",\"proposal_modules_instantiate_info\":[{\"admin\":{\"core_contract\":{}},\"code_id\":453,\"label\":\"DAO DAO Proposal Module\",\"msg\":\"eyJ0aHJlc2hvbGQiOnsidGhyZXNob2xkX3F1b3J1bSI6eyJ0aHJlc2hvbGQiOnsibWFqb3JpdHkiOnt9fSwicXVvcnVtIjp7InBlcmNlbnQiOiIwLjAxIn19fSwibWF4X3ZvdGluZ19wZXJpb2QiOnsidGltZSI6NDMyMDAwfSwibWluX3ZvdGluZ19wZXJpb2QiOm51bGwsIm9ubHlfbWVtYmVyc19leGVjdXRlIjp0cnVlLCJhbGxvd19yZXZvdGluZyI6ZmFsc2UsImRlcG9zaXRfaW5mbyI6eyJ0b2tlbiI6eyJ2b3RpbmdfbW9kdWxlX3Rva2VuIjp7fX0sImRlcG9zaXQiOiIxMDAwMDAwMDAwIiwicmVmdW5kX2ZhaWxlZF9wcm9wb3NhbHMiOnRydWV9fQ==\"}],\"voting_module_instantiate_info\":{\"admin\":{\"core_contract\":{}},\"code_id\":451,\"label\":\"DAO DAO Voting Module\",\"msg\":\"eyJ0b2tlbl9pbmZvIjp7Im5ldyI6eyJjb2RlX2lkIjo3NywibGFiZWwiOiJEQU8gREFPIEdvdiB0b2tlbiIsIm5hbWUiOiJEQU8iLCJzeW1ib2wiOiJEQU8iLCJkZWNpbWFscyI6NiwiaW5pdGlhbF9iYWxhbmNlcyI6W3siYWRkcmVzcyI6Imp1bm8xZnQ1emZmZnJndG0ydTcyY3VwOWUyZWNmeGp3ejh6dGM5MjljZ2oiLCJhbW91bnQiOiIxMDAwMDAwMDAwMDAwMDAwIn1dLCJtYXJrZXRpbmciOm51bGwsInN0YWtpbmdfY29kZV9pZCI6NDQ5LCJ1bnN0YWtpbmdfZHVyYXRpb24iOnsidGltZSI6MTIwOTYwMH0sImluaXRpYWxfZGFvX2JhbGFuY2UiOm51bGx9fSwiYWN0aXZlX3RocmVzaG9sZCI6bnVsbH0=\"}}"
+        "Instantiate__exc_stake_create_dao": {
+            "file_name": "ci/integration_tests/src/helpers/helper.rs",
+            "gas_used": 953334,
+            "gas_wanted": 1405392,
+            "line_number": 86
+        },
+        "Execute__exc_items_rm": {
+            "file_name": "ci/integration_tests/src/tests/cw_core_test.rs",
+            "gas_used": 192594,
+            "gas_wanted": 264378,
+            "line_number": 167
+        },
+        "Execute__exc_items_set": {
+            "file_name": "ci/integration_tests/src/tests/cw_core_test.rs",
+            "gas_used": 194260,
+            "gas_wanted": 266879,
+            "line_number": 132
+        },
+        "Instantiate__exc_items_create_dao": {
+            "file_name": "ci/integration_tests/src/helpers/helper.rs",
+            "gas_used": 954408,
+            "gas_wanted": 1407003,
+            "line_number": 86
+        },
+        "Instantiate__inst_admin_create_dao": {
+            "file_name": "ci/integration_tests/src/helpers/helper.rs",
+            "gas_used": 954408,
+            "gas_wanted": 1407003,
+            "line_number": 86
+        },
+        "Instantiate__inst_dao_no_admin": {
+            "file_name": "ci/integration_tests/src/helpers/helper.rs",
+            "gas_used": 953358,
+            "gas_wanted": 1405428,
+            "line_number": 86
+        }
+    },
+    "cw_named_groups": {
+        "Store__Store": {
+            "file_name": "ci/integration_tests/src/helpers/chain.rs",
+            "gas_used": 19605940,
+            "gas_wanted": 29384270,
+            "line_number": 84
+        }
+    },
+    "cw_names_registry": {
+        "Store__Store": {
+            "file_name": "ci/integration_tests/src/helpers/chain.rs",
+            "gas_used": 21283000,
+            "gas_wanted": 31899860,
+            "line_number": 84
+        }
+    },
+    "cw_native_staked_balance_voting": {
+        "Store__Store": {
+            "file_name": "ci/integration_tests/src/helpers/chain.rs",
+            "gas_used": 23299520,
+            "gas_wanted": 34924640,
+            "line_number": 84
+        }
+    },
+    "cw_proposal_multiple": {
+        "Store__Store": {
+            "file_name": "ci/integration_tests/src/helpers/chain.rs",
+            "gas_used": 50927010,
+            "gas_wanted": 76365875,
+            "line_number": 84
+        }
+    },
+    "cw_proposal_single": {
+        "Store__Store": {
+            "file_name": "ci/integration_tests/src/helpers/chain.rs",
+            "gas_used": 49634400,
+            "gas_wanted": 74426960,
+            "line_number": 84
+        }
+    },
+    "cw_token_swap": {
+        "Store__Store": {
+            "file_name": "ci/integration_tests/src/helpers/chain.rs",
+            "gas_used": 19029430,
+            "gas_wanted": 28519505,
+            "line_number": 84
+        }
+    },
+    "stake_cw20_external_rewards": {
+        "Store__Store": {
+            "file_name": "ci/integration_tests/src/helpers/chain.rs",
+            "gas_used": 25313510,
+            "gas_wanted": 37945625,
+            "line_number": 84
+        }
+    },
+    "stake_cw20_reward_distributor": {
+        "Store__Store": {
+            "file_name": "ci/integration_tests/src/helpers/chain.rs",
+            "gas_used": 19081240,
+            "gas_wanted": 28597220,
+            "line_number": 84
         }
     }
 }
