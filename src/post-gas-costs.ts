@@ -163,7 +163,7 @@ async function buildComment(
 
   for (const [contract, v] of Object.entries(gasUsage)) {
     for (const [op_name, report] of Object.entries(v)) {
-      commentSpoiler += `| ${contract} | ${op_name} | ${report.gas_used} | ${report.gas_wanted} | [${report.file_name}:${report.line_number}](${report.file_name}:${report.line_number}) |\n`
+      commentSpoiler += `| ${contract} | ${op_name} | ${report.gas_used} | ${report.gas_wanted} | ${report.file_name}:${report.line_number} |\n`
     }
   }
   commentSpoiler += '</details>'
