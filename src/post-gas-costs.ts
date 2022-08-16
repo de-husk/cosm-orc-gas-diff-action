@@ -132,7 +132,7 @@ async function buildComment(
   oldGasUsage?: Report
 ): Promise<string> {
   const commentHeader = `![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png) \
-    ~ [Cosm-Orc](https://github.com/de-husk/cosm-orc) Gas Usage Report ~ \
+    ~ Cosm-Orc Gas Usage Report ~ \
     ![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png)
   `
 
@@ -161,16 +161,16 @@ async function buildComment(
   let commentSpoiler = `<details><summary>Raw Report for ${sha}</summary>\n\n`
 
   for (const [contract, v] of Object.entries(gasUsage)) {
-    commentSpoiler += `  * ${contract}:\n`
+    commentSpoiler += `| Contract | Op Name | Gas Used | Gas Wanted | File | Gas Used Diff |  \n| --- | --- | --- | --- | --- | --- |`
 
     for (const [op_name, report] of Object.entries(v)) {
-      commentSpoiler += `    * ${op_name}:\n`
-      commentSpoiler += `      * GasUsed: ${report.gas_used}\n`
-      commentSpoiler += `      * GasWanted: ${report.gas_wanted}\n`
-      commentSpoiler += `      * File: ${report.file_name}:${report.line_number}\n`
+      commentSpoiler += `| ${contract} | ${op_name} | ${report.gas_used} | ${report.gas_wanted} | ${report.file_name}:${report.line_number} |`
 
       if (diffMap && diffMap[contract] && diffMap[contract][op_name]) {
-        commentSpoiler += `      * Diff: ${diffMap[contract][op_name]} %\n`
+        commentSpoiler += ` ${diffMap[contract][op_name]}% |\n`
+      } else {
+        // TODO: Dont put this if we arent diffing
+        commentSpoiler += `N/A |\n`
       }
     }
   }
