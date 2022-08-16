@@ -185,8 +185,8 @@ function buildComment(gasUsage, sha, github, context, diffMap, oldGasUsage) {
             }
         }
         let commentSpoiler = `<details><summary>Raw Report for ${sha}</summary>\n\n`;
+        commentSpoiler += `| Contract | Op Name | Gas Used | Gas Wanted | File | Gas Used Diff |  \n| --- | --- | --- | --- | --- | --- |\n`;
         for (const [contract, v] of Object.entries(gasUsage)) {
-            commentSpoiler += `| Contract | Op Name | Gas Used | Gas Wanted | File | Gas Used Diff |  \n| --- | --- | --- | --- | --- | --- |\n`;
             for (const [op_name, report] of Object.entries(v)) {
                 commentSpoiler += `| ${contract} | ${op_name} | ${report.gas_used} | ${report.gas_wanted} | ${report.file_name}:${report.line_number} |`;
                 if (diffMap && diffMap[contract] && diffMap[contract][op_name]) {
