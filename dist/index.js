@@ -161,7 +161,7 @@ function calcDiff(curGasUsage, oldGasUsage) {
 function buildComment(gasUsage, sha, github, context, diffMap, oldGasUsage) {
     return __awaiter(this, void 0, void 0, function* () {
         const commentHeader = `![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png) \
-    ~ Cosm-Orc Gas Usage Report ~ \
+    Cosm-Orc Gas Usage Report \
     ![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png)
   `;
         // Only show diffs that are greater than `minDiffShowcase`

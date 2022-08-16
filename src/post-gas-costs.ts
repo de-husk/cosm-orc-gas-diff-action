@@ -132,7 +132,7 @@ async function buildComment(
   oldGasUsage?: Report
 ): Promise<string> {
   const commentHeader = `![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png) \
-    ~ Cosm-Orc Gas Usage Report ~ \
+    Cosm-Orc Gas Usage Report \
     ![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png)
   `
 
