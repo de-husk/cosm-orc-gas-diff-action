@@ -150,11 +150,11 @@ async function buildComment(
           const newReport = gasUsage[contract][op_name]
           const oldReport = oldGasUsage[contract][op_name]
 
-          let sign = diff < 0 ? '-' : '+'
+          let sign = diff > 0 ? '+' : ''
 
           commentBody += `| ${contract} | ${op_name} | ${
             newReport.gas_used
-          } | ${oldReport.gas_used} | ${sign} ${diff.toFixed(4)}% | ${
+          } | ${oldReport.gas_used} | ${sign}${diff.toFixed(4)}% | ${
             newReport.file_name
           }:${newReport.line_number} |\n`
 
