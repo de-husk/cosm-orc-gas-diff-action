@@ -176,7 +176,8 @@ function buildComment(gasUsage, sha, github, context, diffMap, oldGasUsage) {
                     if (Math.abs(diff) >= minDiffShowcase) {
                         const newReport = gasUsage[contract][op_name];
                         const oldReport = oldGasUsage[contract][op_name];
-                        commentBody += `| ${contract} | ${op_name} | ${newReport.gas_used} | ${oldReport.gas_used} | ${diff.toFixed(4)} % | ${newReport.file_name}:${newReport.line_number} |\n`;
+                        let sign = diff < 0 ? '-' : '+';
+                        commentBody += `| ${contract} | ${op_name} | ${newReport.gas_used} | ${oldReport.gas_used} | ${sign} ${diff.toFixed(4)}% | ${newReport.file_name}:${newReport.line_number} |\n`;
                         diffCount += 1;
                     }
                 }
