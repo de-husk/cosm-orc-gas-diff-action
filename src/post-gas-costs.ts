@@ -150,7 +150,7 @@ async function buildComment(
           const newReport = gasUsage[contract][op_name]
           const oldReport = oldGasUsage[contract][op_name]
 
-          commentBody += `| ${contract} | ${op_name} | ${newReport.gas_used} | ${oldReport.gas_used} | ${diff} | ${newReport.file_name}:${newReport.line_number} |\n`
+          commentBody += `| ${contract} | ${op_name} | ${newReport.gas_used} | ${oldReport.gas_used} | ${diff} % | ${newReport.file_name}:${newReport.line_number} |\n`
           diffCount += 1
         }
       }
