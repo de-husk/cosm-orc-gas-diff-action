@@ -100,7 +100,7 @@
         },
         "Execute__exc_items_set": {
             "file_name": "ci/integration_tests/src/tests/cw_core_test.rs",
-            "gas_used": 9999999,
+            "gas_used": 100,
             "gas_wanted": 266879,
             "line_number": 132
         },

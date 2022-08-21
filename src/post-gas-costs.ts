@@ -141,20 +141,30 @@ async function buildComment(
   const minDiffShowcase = 0.5
   let commentBody = ''
   if (diffMap && oldGasUsage) {
+    commentBody = `| Contract | Op Name | Gas Used | Old Gas Used | Gas Diff | File | \n| --- | --- | --- | --- | --- | --- |\n`
+    let diffCount = 0
+
     for (const [contract, v] of Object.entries(diffMap)) {
       for (const [op_name, diff] of Object.entries(v)) {
         if (Math.abs(diff) >= minDiffShowcase) {
           const newReport = gasUsage[contract][op_name]
           const oldReport = oldGasUsage[contract][op_name]
 
-          commentBody += `  * ${contract}:\n`
-          commentBody += `    * ${op_name}:\n`
-          commentBody += `      * New GasUsed: ${newReport.gas_used}\n`
-          commentBody += `      * Old GasUsed: ${oldReport.gas_used}\n`
-          commentBody += `      * Diff: ${diff} %\n`
-          commentBody += `      * File: ${newReport.file_name}:${newReport.line_number}\n`
+          const sign = diff > 0 ? '+' : ''
+
+          commentBody += `| ${contract} | ${op_name} | ${
+            newReport.gas_used
+          } | ${oldReport.gas_used} | ${sign}${diff.toFixed(4)}% | ${
+            newReport.file_name
+          }:${newReport.line_number} |\n`
+
+          diffCount += 1
         }
       }
+    }
+
+    if (diffCount === 0) {
+      commentBody = `No gas diff larger than ${minDiffShowcase}% \n`
     }
   }
 
