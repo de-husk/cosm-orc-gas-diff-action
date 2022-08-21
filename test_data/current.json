@@ -1,5 +1,11 @@
 {
     "cw20_base": {
+        "Store__Store": {
+            "file_name": "src/main.ts",
+            "gas_used": 9999999999999,
+            "gas_wanted": 999999999988,
+            "line_number": 8
+        },
         "Execute__exc_stake_stake_tokens": {
             "file_name": "ci/integration_tests/src/tests/cw20_stake_test.rs",
             "gas_used": 234585,
@@ -91,6 +97,12 @@
             "gas_used": 192594,
             "gas_wanted": 264378,
             "line_number": 167
+        },
+        "Execute__exc_items_set": {
+            "file_name": "ci/integration_tests/src/tests/cw_core_test.rs",
+            "gas_used": 100,
+            "gas_wanted": 266879,
+            "line_number": 132
         },
         "Instantiate__exc_items_create_dao": {
             "file_name": "ci/integration_tests/src/helpers/helper.rs",
