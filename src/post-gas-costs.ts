@@ -155,7 +155,7 @@ async function buildComment(
   const minDiffShowcase = 0.5
   let commentBody = ''
   if (diffMap && oldGasUsage) {
-    commentBody = `| Contract | Op Name | Gas Used | Old Gas Used | Gas Diff | File | \n| --- | --- | --- | --- | --- | --- |\n`
+    commentBody = `| Contract | Op Name | Gas Used | Old Gas Used | Gas Diff | File | \n | --- | --- | --- | --- | --- | --- |\n`
     let diffCount = 0
 
     for (const [contract, v] of Object.entries(diffMap)) {
@@ -192,5 +192,5 @@ async function buildComment(
   }
   commentSpoiler += '</details>'
 
-  return `${commentHeader}\n${commentBody}\n\n${commentSpoiler}`
+  return `${commentHeader} \n <br/> ${commentBody} \n <br/> ${commentSpoiler}`
 }
