@@ -206,7 +206,7 @@ function calcDiff(curGasUsage, oldGasUsage) {
 }
 function buildComment(gasUsage, sha, github, context, diffMap, oldGasUsage) {
     return __awaiter(this, void 0, void 0, function* () {
-        const commentHeader = `<h1>Cosm-Orc Gas Usage</h1><br/>`;
+        const commentHeader = `<h1>Cosm-Orc Gas Usage</h1>`;
         // Only show diffs that are greater than `minDiffShowcase`
         // the rest will be under the spoiler
         const minDiffShowcase = 0.5;

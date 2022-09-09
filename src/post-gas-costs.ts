@@ -148,7 +148,7 @@ async function buildComment(
   diffMap?: DiffMap,
   oldGasUsage?: Report
 ): Promise<string> {
-  const commentHeader = `<h1>Cosm-Orc Gas Usage</h1><br/>`
+  const commentHeader = `<h1>Cosm-Orc Gas Usage</h1>`
 
   // Only show diffs that are greater than `minDiffShowcase`
   // the rest will be under the spoiler
