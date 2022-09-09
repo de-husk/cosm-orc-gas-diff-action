@@ -237,7 +237,7 @@ function buildComment(gasUsage, sha, github, context, diffMap, oldGasUsage) {
             }
         }
         commentSpoiler += '</details>';
-        return `${commentHeader} <br/> \n ${commentBody} \n <br/> ${commentSpoiler}`;
+        return `${commentHeader} <br/> \n \n ${commentBody} \n <br/> ${commentSpoiler}`;
     });
 }
 
