@@ -157,10 +157,7 @@ function getGithubPRSha(github, context) {
 }
 function postJobSummary(commentBody) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield core.summary
-            .addHeading('Cosm-Orc Gas Usage')
-            .addRaw(commentBody)
-            .write();
+        yield core.summary.addRaw(commentBody).write();
     });
 }
 function sendGithubIssueComment(commentBody, github, context) {
@@ -215,7 +212,7 @@ function buildComment(gasUsage, sha, github, context, diffMap, oldGasUsage) {
         const minDiffShowcase = 0.5;
         let commentBody = '';
         if (diffMap && oldGasUsage) {
-            commentBody = `| Contract | Op Name | Gas Used | Old Gas Used | Gas Diff | File | \n | --- | --- | --- | --- | --- | --- |\n`;
+            commentBody = `| Contract | Op Name | Gas Used | Old Gas Used | Gas Diff | File | \n| --- | --- | --- | --- | --- | --- |\n`;
             let diffCount = 0;
             for (const [contract, v] of Object.entries(diffMap)) {
                 for (const [op_name, diff] of Object.entries(v)) {

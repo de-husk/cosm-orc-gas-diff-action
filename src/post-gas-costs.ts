@@ -76,10 +76,7 @@ async function getGithubPRSha(
 }
 
 async function postJobSummary(commentBody: string): Promise<void> {
-  await core.summary
-    .addHeading('Cosm-Orc Gas Usage')
-    .addRaw(commentBody)
-    .write()
+  await core.summary.addRaw(commentBody).write()
 }
 
 async function sendGithubIssueComment(
@@ -158,7 +155,7 @@ async function buildComment(
   const minDiffShowcase = 0.5
   let commentBody = ''
   if (diffMap && oldGasUsage) {
-    commentBody = `| Contract | Op Name | Gas Used | Old Gas Used | Gas Diff | File | \n | --- | --- | --- | --- | --- | --- |\n`
+    commentBody = `| Contract | Op Name | Gas Used | Old Gas Used | Gas Diff | File | \n| --- | --- | --- | --- | --- | --- |\n`
     let diffCount = 0
 
     for (const [contract, v] of Object.entries(diffMap)) {
