@@ -26,7 +26,7 @@ export async function postUsage(
   const sha = await getGithubPRSha(github, context)
   const gasUsage = getGasUsage(current_json_path)
   const commentBody = await buildComment(gasUsage, sha, github, context)
-  await sendGithubStatusComment(commentBody, github, context)
+  await sendGithubIssueComment(commentBody, github, context)
 }
 
 export async function postDiff(
@@ -47,7 +47,7 @@ export async function postDiff(
     diffMap,
     oldGasUsage
   )
-  await sendGithubStatusComment(commentBody, github, context)
+  await sendGithubIssueComment(commentBody, github, context)
 }
 
 async function getGithubPRSha(
@@ -62,7 +62,7 @@ async function getGithubPRSha(
   return pr.data.head.sha
 }
 
-async function sendGithubStatusComment(
+async function sendGithubIssueComment(
   commentBody: string,
   github: InstanceType<typeof GitHub>,
   context: Context
