@@ -117,7 +117,12 @@ function postUsage(current_json_path, github, context) {
             yield sendGithubIssueComment(commentBody, github, context);
         }
         catch (error) {
-            console.error('Error sending sendGithubIssueComment()');
+            if (error instanceof Error) {
+                core.warning(error.message);
+            }
+            else {
+                core.warning('sendGithubIssueComment() failed');
+            }
         }
         postJobSummary(commentBody);
     });
@@ -134,7 +139,12 @@ function postDiff(current_json_path, old_json_path, github, context) {
             yield sendGithubIssueComment(commentBody, github, context);
         }
         catch (error) {
-            console.error('Error sending sendGithubIssueComment()');
+            if (error instanceof Error) {
+                core.warning(error.message);
+            }
+            else {
+                core.warning('sendGithubIssueComment() failed');
+            }
         }
         postJobSummary(commentBody);
     });
