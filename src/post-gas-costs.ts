@@ -67,38 +67,29 @@ async function sendGithubStatusComment(
   github: InstanceType<typeof GitHub>,
   context: Context
 ): Promise<void> {
-  await github.rest.repos.createCommitStatus({
+  const {data: comments} = await github.rest.issues.listComments({
+    issue_number: context.issue.number,
     owner: context.repo.owner,
-    repo: context.repo.repo,
-    sha: context.sha,
-    state: 'success', // TODO: Dont hardcode
-    description: commentBody,
-    context: 'cosm_orc_gas_diff'
+    repo: context.repo.repo
   })
 
-  // const {data: comments} = await github.rest.issues.listComments({
-  //   issue_number: context.issue.number,
-  //   owner: context.repo.owner,
-  //   repo: context.repo.repo
-  // })
+  const botComment = comments.find(comment => comment?.user?.id === 41898282)
 
-  // const botComment = comments.find(comment => comment?.user?.id === 41898282)
-
-  // if (botComment) {
-  //   await github.rest.issues.updateComment({
-  //     comment_id: botComment.id,
-  //     owner: context.repo.owner,
-  //     repo: context.repo.repo,
-  //     body: commentBody
-  //   })
-  // } else {
-  //   await github.rest.issues.createComment({
-  //     issue_number: context.issue.number,
-  //     owner: context.repo.owner,
-  //     repo: context.repo.repo,
-  //     body: commentBody
-  //   })
-  // }
+  if (botComment) {
+    await github.rest.issues.updateComment({
+      comment_id: botComment.id,
+      owner: context.repo.owner,
+      repo: context.repo.repo,
+      body: commentBody
+    })
+  } else {
+    await github.rest.issues.createComment({
+      issue_number: context.issue.number,
+      owner: context.repo.owner,
+      repo: context.repo.repo,
+      body: commentBody
+    })
+  }
 }
 
 function getGasUsage(json_file: string): Report {

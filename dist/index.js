@@ -116,35 +116,28 @@ function getGithubPRSha(github, context) {
 }
 function sendGithubStatusComment(commentBody, github, context) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield github.rest.repos.createCommitStatus({
+        const { data: comments } = yield github.rest.issues.listComments({
+            issue_number: context.issue.number,
             owner: context.repo.owner,
-            repo: context.repo.repo,
-            sha: context.sha,
-            state: 'success',
-            description: commentBody,
-            context: 'cosm_orc_gas_diff'
+            repo: context.repo.repo
         });
-        // const {data: comments} = await github.rest.issues.listComments({
-        //   issue_number: context.issue.number,
-        //   owner: context.repo.owner,
-        //   repo: context.repo.repo
-        // })
-        // const botComment = comments.find(comment => comment?.user?.id === 41898282)
-        // if (botComment) {
-        //   await github.rest.issues.updateComment({
-        //     comment_id: botComment.id,
-        //     owner: context.repo.owner,
-        //     repo: context.repo.repo,
-        //     body: commentBody
-        //   })
-        // } else {
-        //   await github.rest.issues.createComment({
-        //     issue_number: context.issue.number,
-        //     owner: context.repo.owner,
-        //     repo: context.repo.repo,
-        //     body: commentBody
-        //   })
-        // }
+        const botComment = comments.find(comment => { var _a; return ((_a = comment === null || comment === void 0 ? void 0 : comment.user) === null || _a === void 0 ? void 0 : _a.id) === 41898282; });
+        if (botComment) {
+            yield github.rest.issues.updateComment({
+                comment_id: botComment.id,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: commentBody
+            });
+        }
+        else {
+            yield github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: commentBody
+            });
+        }
     });
 }
 function getGasUsage(json_file) {
