@@ -13,13 +13,6 @@ async function run(): Promise<void> {
     const github_token: string = core.getInput('repo_token', {required: true})
     const octokit = github.getOctokit(github_token)
 
-    // TODO: I should always post the markdown as a job summary regardless of permission levels
-    // https://github.blog/2022-05-09-supercharging-github-actions-with-job-summaries/
-    // <--
-    // <--
-    //
-    // and then if you have read only perms I should just not post a PR comment
-
     const perms = await octokit.rest.repos.getCollaboratorPermissionLevel({
       owner: github.context.repo.owner,
       repo: github.context.repo.repo,

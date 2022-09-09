@@ -1,3 +1,4 @@
+import * as core from '@actions/core'
 import {Context} from '@actions/github/lib/context'
 import {GitHub} from '@actions/github/lib/utils'
 import {readFileSync} from 'fs'
@@ -31,6 +32,8 @@ export async function postUsage(
   if (!readOnly) {
     await sendGithubIssueComment(commentBody, github, context)
   }
+
+  postJobSummary(commentBody)
 }
 
 export async function postDiff(
@@ -56,6 +59,8 @@ export async function postDiff(
   if (!readOnly) {
     await sendGithubIssueComment(commentBody, github, context)
   }
+
+  postJobSummary(commentBody)
 }
 
 async function getGithubPRSha(
@@ -68,6 +73,13 @@ async function getGithubPRSha(
     pull_number: context.issue.number
   })
   return pr.data.head.sha
+}
+
+async function postJobSummary(commentBody: string): Promise<void> {
+  await core.summary
+    .addHeading('Cosm Orc Gas Usage')
+    .addRaw(commentBody)
+    .write()
 }
 
 async function sendGithubIssueComment(

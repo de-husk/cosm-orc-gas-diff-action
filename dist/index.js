@@ -50,12 +50,6 @@ function run() {
             const old = core.getInput('old_json');
             const github_token = core.getInput('repo_token', { required: true });
             const octokit = github.getOctokit(github_token);
-            // TODO: I should always post the markdown as a job summary regardless of permission levels
-            // https://github.blog/2022-05-09-supercharging-github-actions-with-job-summaries/
-            // <--
-            // <--
-            //
-            // and then if you have read only perms I should just not post a PR comment
             const perms = yield octokit.rest.repos.getCollaboratorPermissionLevel({
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
@@ -88,6 +82,29 @@ run();
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -99,6 +116,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.postDiff = exports.postUsage = void 0;
+const core = __importStar(__nccwpck_require__(2186));
 const fs_1 = __nccwpck_require__(7147);
 function postUsage(current_json_path, github, context, readOnly) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -108,6 +126,7 @@ function postUsage(current_json_path, github, context, readOnly) {
         if (!readOnly) {
             yield sendGithubIssueComment(commentBody, github, context);
         }
+        postJobSummary(commentBody);
     });
 }
 exports.postUsage = postUsage;
@@ -121,6 +140,7 @@ function postDiff(current_json_path, old_json_path, github, context, readOnly) {
         if (!readOnly) {
             yield sendGithubIssueComment(commentBody, github, context);
         }
+        postJobSummary(commentBody);
     });
 }
 exports.postDiff = postDiff;
@@ -132,6 +152,14 @@ function getGithubPRSha(github, context) {
             pull_number: context.issue.number
         });
         return pr.data.head.sha;
+    });
+}
+function postJobSummary(commentBody) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield core.summary
+            .addHeading('Cosm Orc Gas Usage')
+            .addRaw(commentBody)
+            .write();
     });
 }
 function sendGithubIssueComment(commentBody, github, context) {
