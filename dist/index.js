@@ -209,16 +209,13 @@ function calcDiff(curGasUsage, oldGasUsage) {
 }
 function buildComment(gasUsage, sha, github, context, diffMap, oldGasUsage) {
     return __awaiter(this, void 0, void 0, function* () {
-        const commentHeader = `<br/>![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png) \
-    Cosm-Orc Gas Usage Report \
-    ![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png)
-  `;
+        const commentHeader = `<h1>Cosm-Orc Gas Usage</h1><br/>`;
         // Only show diffs that are greater than `minDiffShowcase`
         // the rest will be under the spoiler
         const minDiffShowcase = 0.5;
         let commentBody = '';
         if (diffMap && oldGasUsage) {
-            commentBody = `<br/>| Contract | Op Name | Gas Used | Old Gas Used | Gas Diff | File | \n| --- | --- | --- | --- | --- | --- |\n`;
+            commentBody = `| Contract | Op Name | Gas Used | Old Gas Used | Gas Diff | File | \n | --- | --- | --- | --- | --- | --- |\n`;
             let diffCount = 0;
             for (const [contract, v] of Object.entries(diffMap)) {
                 for (const [op_name, diff] of Object.entries(v)) {
@@ -235,8 +232,8 @@ function buildComment(gasUsage, sha, github, context, diffMap, oldGasUsage) {
                 commentBody = `No gas diff larger than ${minDiffShowcase}% \n`;
             }
         }
-        let commentSpoiler = `<br/><details><summary>Raw Report for ${sha}</summary><br/> \n\n`;
-        commentSpoiler += `| Contract | Op Name | Gas Used | Gas Wanted | File | \n| --- | --- | --- | --- | --- |\n`;
+        let commentSpoiler = `<br/> <details><summary>Raw Report for ${sha} </summary><br/> \n\n`;
+        commentSpoiler += `| Contract | Op Name | Gas Used | Gas Wanted | File | \n | --- | --- | --- | --- | --- |\n`;
         for (const [contract, v] of Object.entries(gasUsage)) {
             for (const [op_name, report] of Object.entries(v)) {
                 commentSpoiler += `| ${contract} | ${op_name} | ${report.gas_used} | ${report.gas_wanted} | ${report.file_name}:${report.line_number} |\n`;
