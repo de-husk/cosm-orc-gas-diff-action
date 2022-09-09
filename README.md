@@ -1,6 +1,8 @@
 # Cosm-Orc Gas Diff Github Action
 
-Github action that posts gas usage reports from [cosm-orc](https://github.com/de-husk/cosm-orc) as Github PR comments.
+Github action that posts gas usage reports from [cosm-orc](https://github.com/de-husk/cosm-orc) as Github PR comments and a Github action job summary.
+
+If `repo_token` does not have `issues` write access, then the Github PR comment will be skipped, however the Github action job summary will still be posted.
 
 ## Usage
 ```yml

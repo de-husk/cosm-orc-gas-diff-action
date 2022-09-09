@@ -1,0 +1,19 @@
+name: 'build-test-ro'
+on: # rebuild any PRs and main branch changes
+  pull_request:
+  push:
+    branches:
+      - main
+      - 'releases/*'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions: read-all
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          current_json: "./test_data/current.json"
+          old_json: "./test_data/old.json"

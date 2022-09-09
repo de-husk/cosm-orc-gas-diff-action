@@ -72,6 +72,29 @@ run();
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -83,13 +106,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.postDiff = exports.postUsage = void 0;
+const core = __importStar(__nccwpck_require__(2186));
 const fs_1 = __nccwpck_require__(7147);
 function postUsage(current_json_path, github, context) {
     return __awaiter(this, void 0, void 0, function* () {
         const sha = yield getGithubPRSha(github, context);
         const gasUsage = getGasUsage(current_json_path);
         const commentBody = yield buildComment(gasUsage, sha, github, context);
-        yield sendGithubIssueComment(commentBody, github, context);
+        try {
+            yield sendGithubIssueComment(commentBody, github, context);
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                core.warning(error.message);
+            }
+            else {
+                core.warning('sendGithubIssueComment() failed');
+            }
+        }
+        postJobSummary(commentBody);
     });
 }
 exports.postUsage = postUsage;
@@ -100,7 +135,18 @@ function postDiff(current_json_path, old_json_path, github, context) {
         const oldGasUsage = getGasUsage(old_json_path);
         const diffMap = calcDiff(curGasUsage, oldGasUsage);
         const commentBody = yield buildComment(curGasUsage, sha, github, context, diffMap, oldGasUsage);
-        yield sendGithubIssueComment(commentBody, github, context);
+        try {
+            yield sendGithubIssueComment(commentBody, github, context);
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                core.warning(error.message);
+            }
+            else {
+                core.warning('sendGithubIssueComment() failed');
+            }
+        }
+        postJobSummary(commentBody);
     });
 }
 exports.postDiff = postDiff;
@@ -112,6 +158,11 @@ function getGithubPRSha(github, context) {
             pull_number: context.issue.number
         });
         return pr.data.head.sha;
+    });
+}
+function postJobSummary(commentBody) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield core.summary.addRaw(commentBody).write();
     });
 }
 function sendGithubIssueComment(commentBody, github, context) {
@@ -160,16 +211,13 @@ function calcDiff(curGasUsage, oldGasUsage) {
 }
 function buildComment(gasUsage, sha, github, context, diffMap, oldGasUsage) {
     return __awaiter(this, void 0, void 0, function* () {
-        const commentHeader = `![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png) \
-    Cosm-Orc Gas Usage Report \
-    ![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png)
-  `;
+        const commentHeader = `<h1>Cosm-Orc Gas Usage</h1>`;
         // Only show diffs that are greater than `minDiffShowcase`
         // the rest will be under the spoiler
         const minDiffShowcase = 0.5;
         let commentBody = '';
         if (diffMap && oldGasUsage) {
-            commentBody = `| Contract | Op Name | Gas Used | Old Gas Used | Gas Diff | File | \n| --- | --- | --- | --- | --- | --- |\n`;
+            commentBody = `| Contract | Op Name | Gas Used | Old Gas Used | Gas Diff | File | \n | --- | --- | --- | --- | --- | --- | \n`;
             let diffCount = 0;
             for (const [contract, v] of Object.entries(diffMap)) {
                 for (const [op_name, diff] of Object.entries(v)) {
@@ -185,16 +233,19 @@ function buildComment(gasUsage, sha, github, context, diffMap, oldGasUsage) {
             if (diffCount === 0) {
                 commentBody = `No gas diff larger than ${minDiffShowcase}% \n`;
             }
+            else {
+                core.error(`Gas diff change larger than ${minDiffShowcase}%`);
+            }
         }
-        let commentSpoiler = `<details><summary>Raw Report for ${sha}</summary>\n\n`;
-        commentSpoiler += `| Contract | Op Name | Gas Used | Gas Wanted | File | \n| --- | --- | --- | --- | --- |\n`;
+        let commentSpoiler = `<details><summary>Raw Report for ${sha} </summary><br/> \n\n`;
+        commentSpoiler += `| Contract | Op Name | Gas Used | Gas Wanted | File | \n | --- | --- | --- | --- | --- |\n`;
         for (const [contract, v] of Object.entries(gasUsage)) {
             for (const [op_name, report] of Object.entries(v)) {
                 commentSpoiler += `| ${contract} | ${op_name} | ${report.gas_used} | ${report.gas_wanted} | ${report.file_name}:${report.line_number} |\n`;
             }
         }
         commentSpoiler += '</details>';
-        return `${commentHeader}\n${commentBody}\n\n${commentSpoiler}`;
+        return `${commentHeader} \n \n ${commentBody} \n ${commentSpoiler}`;
     });
 }
 

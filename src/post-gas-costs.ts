@@ -1,3 +1,4 @@
+import * as core from '@actions/core'
 import {Context} from '@actions/github/lib/context'
 import {GitHub} from '@actions/github/lib/utils'
 import {readFileSync} from 'fs'
@@ -26,7 +27,18 @@ export async function postUsage(
   const sha = await getGithubPRSha(github, context)
   const gasUsage = getGasUsage(current_json_path)
   const commentBody = await buildComment(gasUsage, sha, github, context)
-  await sendGithubIssueComment(commentBody, github, context)
+
+  try {
+    await sendGithubIssueComment(commentBody, github, context)
+  } catch (error) {
+    if (error instanceof Error) {
+      core.warning(error.message)
+    } else {
+      core.warning('sendGithubIssueComment() failed')
+    }
+  }
+
+  postJobSummary(commentBody)
 }
 
 export async function postDiff(
@@ -47,7 +59,18 @@ export async function postDiff(
     diffMap,
     oldGasUsage
   )
-  await sendGithubIssueComment(commentBody, github, context)
+
+  try {
+    await sendGithubIssueComment(commentBody, github, context)
+  } catch (error) {
+    if (error instanceof Error) {
+      core.warning(error.message)
+    } else {
+      core.warning('sendGithubIssueComment() failed')
+    }
+  }
+
+  postJobSummary(commentBody)
 }
 
 async function getGithubPRSha(
@@ -60,6 +83,10 @@ async function getGithubPRSha(
     pull_number: context.issue.number
   })
   return pr.data.head.sha
+}
+
+async function postJobSummary(commentBody: string): Promise<void> {
+  await core.summary.addRaw(commentBody).write()
 }
 
 async function sendGithubIssueComment(
@@ -131,17 +158,14 @@ async function buildComment(
   diffMap?: DiffMap,
   oldGasUsage?: Report
 ): Promise<string> {
-  const commentHeader = `![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png) \
-    Cosm-Orc Gas Usage Report \
-    ![gas](https://liquipedia.net/commons/images/thumb/7/7e/Scr-gas-t.png/20px-Scr-gas-t.png)
-  `
+  const commentHeader = `<h1>Cosm-Orc Gas Usage</h1>`
 
   // Only show diffs that are greater than `minDiffShowcase`
   // the rest will be under the spoiler
   const minDiffShowcase = 0.5
   let commentBody = ''
   if (diffMap && oldGasUsage) {
-    commentBody = `| Contract | Op Name | Gas Used | Old Gas Used | Gas Diff | File | \n| --- | --- | --- | --- | --- | --- |\n`
+    commentBody = `| Contract | Op Name | Gas Used | Old Gas Used | Gas Diff | File | \n | --- | --- | --- | --- | --- | --- | \n`
     let diffCount = 0
 
     for (const [contract, v] of Object.entries(diffMap)) {
@@ -165,11 +189,13 @@ async function buildComment(
 
     if (diffCount === 0) {
       commentBody = `No gas diff larger than ${minDiffShowcase}% \n`
+    } else {
+      core.error(`Gas diff change larger than ${minDiffShowcase}%`)
     }
   }
 
-  let commentSpoiler = `<details><summary>Raw Report for ${sha}</summary>\n\n`
-  commentSpoiler += `| Contract | Op Name | Gas Used | Gas Wanted | File | \n| --- | --- | --- | --- | --- |\n`
+  let commentSpoiler = `<details><summary>Raw Report for ${sha} </summary><br/> \n\n`
+  commentSpoiler += `| Contract | Op Name | Gas Used | Gas Wanted | File | \n | --- | --- | --- | --- | --- |\n`
 
   for (const [contract, v] of Object.entries(gasUsage)) {
     for (const [op_name, report] of Object.entries(v)) {
@@ -178,5 +204,5 @@ async function buildComment(
   }
   commentSpoiler += '</details>'
 
-  return `${commentHeader}\n${commentBody}\n\n${commentSpoiler}`
+  return `${commentHeader} \n \n ${commentBody} \n ${commentSpoiler}`
 }
