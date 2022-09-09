@@ -89,7 +89,7 @@ function postUsage(current_json_path, github, context) {
         const sha = yield getGithubPRSha(github, context);
         const gasUsage = getGasUsage(current_json_path);
         const commentBody = yield buildComment(gasUsage, sha, github, context);
-        yield sendGithubIssueComment(commentBody, github, context);
+        yield sendGithubStatusComment(commentBody, github, context);
     });
 }
 exports.postUsage = postUsage;
@@ -100,7 +100,7 @@ function postDiff(current_json_path, old_json_path, github, context) {
         const oldGasUsage = getGasUsage(old_json_path);
         const diffMap = calcDiff(curGasUsage, oldGasUsage);
         const commentBody = yield buildComment(curGasUsage, sha, github, context, diffMap, oldGasUsage);
-        yield sendGithubIssueComment(commentBody, github, context);
+        yield sendGithubStatusComment(commentBody, github, context);
     });
 }
 exports.postDiff = postDiff;
@@ -114,30 +114,37 @@ function getGithubPRSha(github, context) {
         return pr.data.head.sha;
     });
 }
-function sendGithubIssueComment(commentBody, github, context) {
+function sendGithubStatusComment(commentBody, github, context) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { data: comments } = yield github.rest.issues.listComments({
-            issue_number: context.issue.number,
+        yield github.rest.repos.createCommitStatus({
             owner: context.repo.owner,
-            repo: context.repo.repo
+            repo: context.repo.repo,
+            sha: context.sha,
+            state: 'success',
+            description: commentBody,
+            context: 'cosm_orc_gas_diff'
         });
-        const botComment = comments.find(comment => { var _a; return ((_a = comment === null || comment === void 0 ? void 0 : comment.user) === null || _a === void 0 ? void 0 : _a.id) === 41898282; });
-        if (botComment) {
-            yield github.rest.issues.updateComment({
-                comment_id: botComment.id,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: commentBody
-            });
-        }
-        else {
-            yield github.rest.issues.createComment({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: commentBody
-            });
-        }
+        // const {data: comments} = await github.rest.issues.listComments({
+        //   issue_number: context.issue.number,
+        //   owner: context.repo.owner,
+        //   repo: context.repo.repo
+        // })
+        // const botComment = comments.find(comment => comment?.user?.id === 41898282)
+        // if (botComment) {
+        //   await github.rest.issues.updateComment({
+        //     comment_id: botComment.id,
+        //     owner: context.repo.owner,
+        //     repo: context.repo.repo,
+        //     body: commentBody
+        //   })
+        // } else {
+        //   await github.rest.issues.createComment({
+        //     issue_number: context.issue.number,
+        //     owner: context.repo.owner,
+        //     repo: context.repo.repo,
+        //     body: commentBody
+        //   })
+        // }
     });
 }
 function getGasUsage(json_file) {

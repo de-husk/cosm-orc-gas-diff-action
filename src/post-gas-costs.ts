@@ -26,7 +26,7 @@ export async function postUsage(
   const sha = await getGithubPRSha(github, context)
   const gasUsage = getGasUsage(current_json_path)
   const commentBody = await buildComment(gasUsage, sha, github, context)
-  await sendGithubIssueComment(commentBody, github, context)
+  await sendGithubStatusComment(commentBody, github, context)
 }
 
 export async function postDiff(
@@ -47,7 +47,7 @@ export async function postDiff(
     diffMap,
     oldGasUsage
   )
-  await sendGithubIssueComment(commentBody, github, context)
+  await sendGithubStatusComment(commentBody, github, context)
 }
 
 async function getGithubPRSha(
@@ -62,34 +62,43 @@ async function getGithubPRSha(
   return pr.data.head.sha
 }
 
-async function sendGithubIssueComment(
+async function sendGithubStatusComment(
   commentBody: string,
   github: InstanceType<typeof GitHub>,
   context: Context
 ): Promise<void> {
-  const {data: comments} = await github.rest.issues.listComments({
-    issue_number: context.issue.number,
+  await github.rest.repos.createCommitStatus({
     owner: context.repo.owner,
-    repo: context.repo.repo
+    repo: context.repo.repo,
+    sha: context.sha,
+    state: 'success', // TODO: Dont hardcode
+    description: commentBody,
+    context: 'cosm_orc_gas_diff'
   })
 
-  const botComment = comments.find(comment => comment?.user?.id === 41898282)
+  // const {data: comments} = await github.rest.issues.listComments({
+  //   issue_number: context.issue.number,
+  //   owner: context.repo.owner,
+  //   repo: context.repo.repo
+  // })
 
-  if (botComment) {
-    await github.rest.issues.updateComment({
-      comment_id: botComment.id,
-      owner: context.repo.owner,
-      repo: context.repo.repo,
-      body: commentBody
-    })
-  } else {
-    await github.rest.issues.createComment({
-      issue_number: context.issue.number,
-      owner: context.repo.owner,
-      repo: context.repo.repo,
-      body: commentBody
-    })
-  }
+  // const botComment = comments.find(comment => comment?.user?.id === 41898282)
+
+  // if (botComment) {
+  //   await github.rest.issues.updateComment({
+  //     comment_id: botComment.id,
+  //     owner: context.repo.owner,
+  //     repo: context.repo.repo,
+  //     body: commentBody
+  //   })
+  // } else {
+  //   await github.rest.issues.createComment({
+  //     issue_number: context.issue.number,
+  //     owner: context.repo.owner,
+  //     repo: context.repo.repo,
+  //     body: commentBody
+  //   })
+  // }
 }
 
 function getGasUsage(json_file: string): Report {
