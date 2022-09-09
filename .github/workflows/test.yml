@@ -19,12 +19,12 @@ jobs:
     runs-on: ubuntu-latest
     permissions: read-all
     steps:
-      - uses: actions/checkout@v3
-      # Works with only one json file:
-      - uses: ./
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          current_json: "./test_data/current.json"
+      # - uses: actions/checkout@v3
+      # # Works with only one json file:
+      # - uses: ./
+      #   with:
+      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
+      #     current_json: "./test_data/current.json"
       # Works in diff mode with 2 json files:
       - uses: ./
         with:
