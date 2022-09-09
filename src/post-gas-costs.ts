@@ -190,7 +190,7 @@ async function buildComment(
     if (diffCount === 0) {
       commentBody = `No gas diff larger than ${minDiffShowcase}% \n`
     } else {
-      core.error('Gas diff change larger than ${minDiffShowcase}%')
+      core.error(`Gas diff change larger than ${minDiffShowcase}%`)
     }
   }
 

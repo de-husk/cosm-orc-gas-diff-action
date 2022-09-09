@@ -234,7 +234,7 @@ function buildComment(gasUsage, sha, github, context, diffMap, oldGasUsage) {
                 commentBody = `No gas diff larger than ${minDiffShowcase}% \n`;
             }
             else {
-                core.error('Gas diff change larger than ${minDiffShowcase}%');
+                core.error(`Gas diff change larger than ${minDiffShowcase}%`);
             }
         }
         let commentSpoiler = `<details><summary>Raw Report for ${sha} </summary><br/> \n\n`;
