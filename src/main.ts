@@ -3,8 +3,6 @@ import * as github from '@actions/github'
 
 import {postDiff, postUsage} from './post-gas-costs'
 
-const write_perms = ['admin', 'write']
-
 async function run(): Promise<void> {
   try {
     const current: string = core.getInput('current_json', {required: true})

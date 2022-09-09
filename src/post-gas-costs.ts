@@ -31,7 +31,7 @@ export async function postUsage(
   try {
     await sendGithubIssueComment(commentBody, github, context)
   } catch (error) {
-    console.error(error)
+    console.error('Error sending sendGithubIssueComment()')
   }
 
   postJobSummary(commentBody)
@@ -59,7 +59,7 @@ export async function postDiff(
   try {
     await sendGithubIssueComment(commentBody, github, context)
   } catch (error) {
-    console.error(error)
+    console.error('Error sending sendGithubIssueComment()')
   }
 
   postJobSummary(commentBody)
