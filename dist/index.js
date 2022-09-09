@@ -42,6 +42,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 const post_gas_costs_1 = __nccwpck_require__(1764);
+const write_perms = ['admin', 'write'];
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -49,11 +50,26 @@ function run() {
             const old = core.getInput('old_json');
             const github_token = core.getInput('repo_token', { required: true });
             const octokit = github.getOctokit(github_token);
+            // TODO: I should always post the markdown as a job summary regardless of permission levels
+            // https://github.blog/2022-05-09-supercharging-github-actions-with-job-summaries/
+            // <--
+            // <--
+            //
+            // and then if you have read only perms I should just not post a PR comment
+            const perms = yield octokit.rest.repos.getCollaboratorPermissionLevel({
+                owner: github.context.repo.owner,
+                repo: github.context.repo.repo,
+                username: github.context.actor
+            });
+            let readOnly = false;
+            if (!write_perms.includes(perms.data.permission)) {
+                readOnly = true;
+            }
             if (old) {
-                (0, post_gas_costs_1.postDiff)(current, old, octokit, github.context);
+                (0, post_gas_costs_1.postDiff)(current, old, octokit, github.context, readOnly);
             }
             else {
-                (0, post_gas_costs_1.postUsage)(current, octokit, github.context);
+                (0, post_gas_costs_1.postUsage)(current, octokit, github.context, readOnly);
             }
         }
         catch (error) {
@@ -84,23 +100,27 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.postDiff = exports.postUsage = void 0;
 const fs_1 = __nccwpck_require__(7147);
-function postUsage(current_json_path, github, context) {
+function postUsage(current_json_path, github, context, readOnly) {
     return __awaiter(this, void 0, void 0, function* () {
         const sha = yield getGithubPRSha(github, context);
         const gasUsage = getGasUsage(current_json_path);
         const commentBody = yield buildComment(gasUsage, sha, github, context);
-        yield sendGithubIssueComment(commentBody, github, context);
+        if (!readOnly) {
+            yield sendGithubIssueComment(commentBody, github, context);
+        }
     });
 }
 exports.postUsage = postUsage;
-function postDiff(current_json_path, old_json_path, github, context) {
+function postDiff(current_json_path, old_json_path, github, context, readOnly) {
     return __awaiter(this, void 0, void 0, function* () {
         const sha = yield getGithubPRSha(github, context);
         const curGasUsage = getGasUsage(current_json_path);
         const oldGasUsage = getGasUsage(old_json_path);
         const diffMap = calcDiff(curGasUsage, oldGasUsage);
         const commentBody = yield buildComment(curGasUsage, sha, github, context, diffMap, oldGasUsage);
-        yield sendGithubIssueComment(commentBody, github, context);
+        if (!readOnly) {
+            yield sendGithubIssueComment(commentBody, github, context);
+        }
     });
 }
 exports.postDiff = postDiff;

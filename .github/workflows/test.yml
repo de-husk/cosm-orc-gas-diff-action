@@ -7,7 +7,7 @@ on: # rebuild any PRs and main branch changes
       - 'releases/*'
 
 jobs:
-  build: # make sure build/ci work properly
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -15,7 +15,22 @@ jobs:
           yarn install
       - run: |
           yarn run all
-  test: # make sure the action works on a clean machine without building
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      # Works with only one json file:
+      - uses: ./
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          current_json: "./test_data/current.json"
+      # Works in diff mode with 2 json files:
+      - uses: ./
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          current_json: "./test_data/current.json"
+          old_json: "./test_data/old.json"
+  test-read-perms:
     runs-on: ubuntu-latest
     permissions: read-all
     steps:

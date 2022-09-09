@@ -21,19 +21,24 @@ interface GasReport {
 export async function postUsage(
   current_json_path: string,
   github: InstanceType<typeof GitHub>,
-  context: Context
+  context: Context,
+  readOnly: boolean
 ): Promise<void> {
   const sha = await getGithubPRSha(github, context)
   const gasUsage = getGasUsage(current_json_path)
   const commentBody = await buildComment(gasUsage, sha, github, context)
-  await sendGithubIssueComment(commentBody, github, context)
+
+  if (!readOnly) {
+    await sendGithubIssueComment(commentBody, github, context)
+  }
 }
 
 export async function postDiff(
   current_json_path: string,
   old_json_path: string,
   github: InstanceType<typeof GitHub>,
-  context: Context
+  context: Context,
+  readOnly: boolean
 ): Promise<void> {
   const sha = await getGithubPRSha(github, context)
   const curGasUsage = getGasUsage(current_json_path)
@@ -47,7 +52,10 @@ export async function postDiff(
     diffMap,
     oldGasUsage
   )
-  await sendGithubIssueComment(commentBody, github, context)
+
+  if (!readOnly) {
+    await sendGithubIssueComment(commentBody, github, context)
+  }
 }
 
 async function getGithubPRSha(
