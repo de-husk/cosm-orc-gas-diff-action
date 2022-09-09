@@ -19,10 +19,11 @@ async function run(): Promise<void> {
       username: github.context.actor
     })
 
-    let readOnly = false
-    if (!write_perms.includes(perms.data.permission)) {
-      readOnly = true
-    }
+    let readOnly = true
+    // TODO: Just testing
+    // if (!write_perms.includes(perms.data.permission)) {
+    //   readOnly = true
+    // }
 
     if (old) {
       postDiff(current, old, octokit, github.context, readOnly)

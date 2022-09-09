@@ -42,7 +42,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 const post_gas_costs_1 = __nccwpck_require__(1764);
-const write_perms = ['admin', 'write'];
+const write_perms = (/* unused pure expression or super */ null && (['admin', 'write']));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -55,10 +55,11 @@ function run() {
                 repo: github.context.repo.repo,
                 username: github.context.actor
             });
-            let readOnly = false;
-            if (!write_perms.includes(perms.data.permission)) {
-                readOnly = true;
-            }
+            let readOnly = true;
+            // TODO: Just testing
+            // if (!write_perms.includes(perms.data.permission)) {
+            //   readOnly = true
+            // }
             if (old) {
                 (0, post_gas_costs_1.postDiff)(current, old, octokit, github.context, readOnly);
             }
@@ -157,7 +158,7 @@ function getGithubPRSha(github, context) {
 function postJobSummary(commentBody) {
     return __awaiter(this, void 0, void 0, function* () {
         yield core.summary
-            .addHeading('Cosm Orc Gas Usage')
+            .addHeading('Cosm-Orc Gas Usage')
             .addRaw(commentBody)
             .write();
     });

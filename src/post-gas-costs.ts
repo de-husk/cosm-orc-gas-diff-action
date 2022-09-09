@@ -77,7 +77,7 @@ async function getGithubPRSha(
 
 async function postJobSummary(commentBody: string): Promise<void> {
   await core.summary
-    .addHeading('Cosm Orc Gas Usage')
+    .addHeading('Cosm-Orc Gas Usage')
     .addRaw(commentBody)
     .write()
 }
