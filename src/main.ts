@@ -26,6 +26,8 @@ async function run(): Promise<void> {
       username: github.context.actor
     })
 
+    console.log(perms)
+
     let readOnly = false
     if (!write_perms.includes(perms.data.permission)) {
       readOnly = true
