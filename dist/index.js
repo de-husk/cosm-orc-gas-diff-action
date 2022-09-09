@@ -229,7 +229,7 @@ function buildComment(gasUsage, sha, github, context, diffMap, oldGasUsage) {
                 commentBody = `No gas diff larger than ${minDiffShowcase}% \n`;
             }
         }
-        let commentSpoiler = `<br/> <details><summary>Raw Report for ${sha} </summary><br/> \n\n`;
+        let commentSpoiler = `<details><summary>Raw Report for ${sha} </summary><br/> \n\n`;
         commentSpoiler += `| Contract | Op Name | Gas Used | Gas Wanted | File | \n | --- | --- | --- | --- | --- |\n`;
         for (const [contract, v] of Object.entries(gasUsage)) {
             for (const [op_name, report] of Object.entries(v)) {

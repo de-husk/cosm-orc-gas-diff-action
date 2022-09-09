@@ -182,7 +182,7 @@ async function buildComment(
     }
   }
 
-  let commentSpoiler = `<br/> <details><summary>Raw Report for ${sha} </summary><br/> \n\n`
+  let commentSpoiler = `<details><summary>Raw Report for ${sha} </summary><br/> \n\n`
   commentSpoiler += `| Contract | Op Name | Gas Used | Gas Wanted | File | \n | --- | --- | --- | --- | --- |\n`
 
   for (const [contract, v] of Object.entries(gasUsage)) {
