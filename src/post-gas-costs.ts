@@ -192,5 +192,5 @@ async function buildComment(
   }
   commentSpoiler += '</details>'
 
-  return `${commentHeader} <br/> \n \n ${commentBody} \n <br/> ${commentSpoiler}`
+  return `${commentHeader} \n \n ${commentBody} \n ${commentSpoiler}`
 }
