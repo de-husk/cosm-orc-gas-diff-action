@@ -212,7 +212,7 @@ function buildComment(gasUsage, sha, github, context, diffMap, oldGasUsage) {
         const minDiffShowcase = 0.5;
         let commentBody = '';
         if (diffMap && oldGasUsage) {
-            commentBody = `| Contract | Op Name | Gas Used | Old Gas Used | Gas Diff | File | \n | --- | --- | --- | --- | --- | --- |\n`;
+            commentBody = `| Contract | Op Name | Gas Used | Old Gas Used | Gas Diff | File | \n | --- | --- | --- | --- | --- | --- | \n`;
             let diffCount = 0;
             for (const [contract, v] of Object.entries(diffMap)) {
                 for (const [op_name, diff] of Object.entries(v)) {
@@ -237,7 +237,7 @@ function buildComment(gasUsage, sha, github, context, diffMap, oldGasUsage) {
             }
         }
         commentSpoiler += '</details>';
-        return `${commentHeader} \n <br/> ${commentBody} \n <br/> ${commentSpoiler}`;
+        return `${commentHeader} <br/> \n ${commentBody} \n <br/> ${commentSpoiler}`;
     });
 }
 
