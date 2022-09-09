@@ -42,7 +42,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 const post_gas_costs_1 = __nccwpck_require__(1764);
-const write_perms = ['admin', 'write'];
+const write_perms = (/* unused pure expression or super */ null && (['admin', 'write']));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -50,20 +50,11 @@ function run() {
             const old = core.getInput('old_json');
             const github_token = core.getInput('repo_token', { required: true });
             const octokit = github.getOctokit(github_token);
-            const perms = yield octokit.rest.repos.getCollaboratorPermissionLevel({
-                owner: github.context.repo.owner,
-                repo: github.context.repo.repo,
-                username: github.context.actor
-            });
-            let readOnly = false;
-            if (!write_perms.includes(perms.data.permission)) {
-                readOnly = true;
-            }
             if (old) {
-                (0, post_gas_costs_1.postDiff)(current, old, octokit, github.context, readOnly);
+                (0, post_gas_costs_1.postDiff)(current, old, octokit, github.context);
             }
             else {
-                (0, post_gas_costs_1.postUsage)(current, octokit, github.context, readOnly);
+                (0, post_gas_costs_1.postUsage)(current, octokit, github.context);
             }
         }
         catch (error) {
@@ -118,27 +109,33 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.postDiff = exports.postUsage = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const fs_1 = __nccwpck_require__(7147);
-function postUsage(current_json_path, github, context, readOnly) {
+function postUsage(current_json_path, github, context) {
     return __awaiter(this, void 0, void 0, function* () {
         const sha = yield getGithubPRSha(github, context);
         const gasUsage = getGasUsage(current_json_path);
         const commentBody = yield buildComment(gasUsage, sha, github, context);
-        if (!readOnly) {
+        try {
             yield sendGithubIssueComment(commentBody, github, context);
+        }
+        catch (error) {
+            console.error(error);
         }
         postJobSummary(commentBody);
     });
 }
 exports.postUsage = postUsage;
-function postDiff(current_json_path, old_json_path, github, context, readOnly) {
+function postDiff(current_json_path, old_json_path, github, context) {
     return __awaiter(this, void 0, void 0, function* () {
         const sha = yield getGithubPRSha(github, context);
         const curGasUsage = getGasUsage(current_json_path);
         const oldGasUsage = getGasUsage(old_json_path);
         const diffMap = calcDiff(curGasUsage, oldGasUsage);
         const commentBody = yield buildComment(curGasUsage, sha, github, context, diffMap, oldGasUsage);
-        if (!readOnly) {
+        try {
             yield sendGithubIssueComment(commentBody, github, context);
+        }
+        catch (error) {
+            console.error(error);
         }
         postJobSummary(commentBody);
     });

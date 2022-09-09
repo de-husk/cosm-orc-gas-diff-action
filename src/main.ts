@@ -13,21 +13,10 @@ async function run(): Promise<void> {
     const github_token: string = core.getInput('repo_token', {required: true})
     const octokit = github.getOctokit(github_token)
 
-    const perms = await octokit.rest.repos.getCollaboratorPermissionLevel({
-      owner: github.context.repo.owner,
-      repo: github.context.repo.repo,
-      username: github.context.actor
-    })
-
-    let readOnly = false
-    if (!write_perms.includes(perms.data.permission)) {
-      readOnly = true
-    }
-
     if (old) {
-      postDiff(current, old, octokit, github.context, readOnly)
+      postDiff(current, old, octokit, github.context)
     } else {
-      postUsage(current, octokit, github.context, readOnly)
+      postUsage(current, octokit, github.context)
     }
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
