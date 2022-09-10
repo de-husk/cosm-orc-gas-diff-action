@@ -152,12 +152,26 @@ function postDiff(current_json_path, old_json_path, github, context) {
 exports.postDiff = postDiff;
 function getGithubPRSha(github, context) {
     return __awaiter(this, void 0, void 0, function* () {
-        const pr = yield github.rest.pulls.get({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            pull_number: context.issue.number
-        });
-        return pr.data.head.sha;
+        try {
+            const pr = yield github.rest.pulls.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.issue.number
+            });
+            return pr.data.head.sha;
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                core.warning(error.message);
+            }
+            else {
+                core.warning('getGithubPRSha() failed');
+            }
+            // for pull requests, `context.sha` is actualy the merge commit.
+            // which is confusing for pull request review, but if we cant
+            // get the pull request's latest sha this will work as a fallback
+            return context.sha;
+        }
     });
 }
 function postJobSummary(commentBody) {
