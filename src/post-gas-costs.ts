@@ -77,12 +77,26 @@ async function getGithubPRSha(
   github: InstanceType<typeof GitHub>,
   context: Context
 ): Promise<string> {
-  const pr = await github.rest.pulls.get({
-    owner: context.repo.owner,
-    repo: context.repo.repo,
-    pull_number: context.issue.number
-  })
-  return pr.data.head.sha
+  try {
+    const pr = await github.rest.pulls.get({
+      owner: context.repo.owner,
+      repo: context.repo.repo,
+      pull_number: context.issue.number
+    })
+
+    return pr.data.head.sha
+  } catch (error) {
+    if (error instanceof Error) {
+      core.warning(error.message)
+    } else {
+      core.warning('getGithubPRSha() failed')
+    }
+
+    // for pull requests, `context.sha` is actualy the merge commit.
+    // which is confusing for pull request review, but if we cant
+    // get the pull request's latest sha this will work as a fallback
+    return context.sha
+  }
 }
 
 async function postJobSummary(commentBody: string): Promise<void> {
